@@ -27,22 +27,22 @@ Experience transfer is the product.
 ## Product Screenshots
 
 ### Login & Authentication
-![Login Page](portfolio-assets/knowledge-sharing/01-login.png)
+![Login Page](portfolio-assets/knowledge-sharing/01-login.png.jpg)
 
 ### Community Feed
-![Community Feed](portfolio-assets/knowledge-sharing/02-feed.png)
+![Community Feed](portfolio-assets/knowledge-sharing/02-feed.png.jpg)
 
 ### Post Detail & Discussions
-![Post Detail](portfolio-assets/knowledge-sharing/03-post-detail.png)
+![Post Detail](portfolio-assets/knowledge-sharing/03-post-detail.png.jpg)
 
 ### Admin Dashboard
-![Admin Dashboard](portfolio-assets/knowledge-sharing/04-admin-dashboard.png)
+![Admin Dashboard](portfolio-assets/knowledge-sharing/04-admin-dashboard.png.jpg)
 
 ### Mentor Dashboard
-![Mentor Dashboard](portfolio-assets/knowledge-sharing/05-mentor-dashboard.png)
+![Mentor Dashboard](portfolio-assets/knowledge-sharing/05-mentor-dashboard.png.jpg)
 
 ### User Profile
-![User Profile](portfolio-assets/knowledge-sharing/06-user-profile.png)
+![User Profile](portfolio-assets/knowledge-sharing/06-user-profile.png.jpg)
 
 ---
 
