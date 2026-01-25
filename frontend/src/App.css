@@ -1,0 +1,11 @@
+/* App-level helpers */
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-1);
+}
+
+main {
+  flex: 1;
+}

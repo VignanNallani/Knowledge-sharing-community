@@ -1,0 +1,241 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Affan Khan — Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#000;
+      --neon-1:#00f6ff; /* cyan */
+      --neon-2:#ff00d9; /* magenta */
+      --card-bg: rgba(255,255,255,0.03);
+      --glass: rgba(255,255,255,0.04);
+      --accent: var(--neon-1);
+      --text:#e6f7ff;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;}
+    body{
+      margin:0;font-family:'Inter',system-ui,Arial;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(0,246,255,0.04), transparent),
+                  radial-gradient(900px 400px at 90% 90%, rgba(255,0,217,0.03), transparent),
+                  var(--bg);
+      color:var(--text); -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      padding:40px;display:flex;align-items:center;justify-content:center;
+    }
+    .wrap{width:1100px;max-width:96%;}
+
+    /* Header */
+    header{display:flex;gap:30px;align-items:center;margin-bottom:28px}
+    .profile{
+      width:150px;height:150px;border-radius:50%;overflow:hidden;border:6px solid transparent;
+      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+      display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 0 30px rgba(0,0,0,0.6);
+      animation:jump 2.6s ease-in-out infinite;
+    }
+    .profile::after{
+      content:'';position:absolute;inset:0;border-radius:50%;
+      box-shadow:0 0 18px var(--neon-1), 0 0 40px var(--neon-2) inset;
+      mix-blend-mode:screen;pointer-events:none;
+    }
+    .profile img{width:100%;height:100%;object-fit:cover;display:block}
+    @keyframes jump{
+      0%,100%{transform:translateY(0)}
+      50%{transform:translateY(-12px)}
+    }
+    .title{flex:1}
+    .title h1{margin:0;font-size:28px;letter-spacing:0.4px}
+    .title p{margin:6px 0 0;color:#cfefff}
+    .neon-badge{display:inline-block;margin-top:10px;padding:6px 12px;border-radius:999px;font-weight:600;
+      background:linear-gradient(90deg, rgba(0,246,255,0.06), rgba(255,0,217,0.04));
+      box-shadow:0 0 10px rgba(0,246,255,0.12), 0 0 30px rgba(255,0,217,0.06) inset;
+      color:var(--accent);
+    }
+
+    /* Grid */
+    .grid{display:grid;grid-template-columns:1fr 380px;gap:22px}
+
+    /* Cards */
+    .card{background:var(--card-bg);border-radius:14px;padding:18px;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,0.04)}
+    .card::before{content:'';position:absolute;inset:-2px;background:linear-gradient(120deg,var(--neon-1),var(--neon-2));filter:blur(16px);opacity:0.08}
+    .card h3{margin:0 0 10px}
+    .skills{display:flex;flex-wrap:wrap;gap:8px}
+    .pill{padding:8px 12px;border-radius:999px;background:transparent;border:1px solid rgba(255,255,255,0.06);font-weight:600}
+
+    /* Projects */
+    .projects{display:grid;grid-template-columns:repeat(1,1fr);gap:12px}
+    .project{padding:14px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border:1px solid rgba(255,255,255,0.03);position:relative;overflow:hidden}
+    .project .glow{position:absolute;right:-60px;top:-40px;width:220px;height:220px;border-radius:50%;filter:blur(36px);opacity:0.18;background:linear-gradient(90deg,var(--neon-1),var(--neon-2))}
+
+    /* Experience & contact */
+    .list{display:flex;flex-direction:column;gap:10px}
+    .job{padding:10px;border-radius:10px;background:var(--glass);border:1px solid rgba(255,255,255,0.03)}
+
+    /* Hobbies */
+    .hobbies{display:flex;flex-wrap:wrap;gap:10px}
+
+    /* Footer */
+    footer{margin-top:18px;text-align:center;color:#a9dff0}
+
+    /* Neon headings */
+    h2{
+      margin:0 0 12px;font-size:18px;position:relative;padding-bottom:6px
+    }
+    h2::after{content:'';position:absolute;left:0;bottom:0;width:60px;height:3px;border-radius:6px;background:linear-gradient(90deg,var(--neon-1),var(--neon-2));box-shadow:0 0 16px var(--neon-1),0 0 36px var(--neon-2)}
+
+    /* Card hover neon */
+    .card, .project, .job{transition:transform .35s ease, box-shadow .35s ease}
+    .card:hover, .project:hover, .job:hover{transform:translateY(-8px);box-shadow:0 8px 40px rgba(0,0,0,0.6),0 0 36px rgba(0,246,255,0.06)}
+
+    /* Responsive */
+    @media (max-width:920px){
+      .grid{grid-template-columns:1fr}
+      .profile{width:120px;height:120px}
+    }
+
+    /* interactive buttons */
+    .btn{display:inline-block;padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;font-weight:700;cursor:pointer}
+    .btn.neon{box-shadow:0 0 18px rgba(0,246,255,0.08);border-image:linear-gradient(90deg,var(--neon-1),var(--neon-2)) 1}
+
+    /* small details */
+    .muted{color:#9fcfe8;font-size:14px}
+    a{color:var(--neon-1);text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="profile">
+        <img src="https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=600&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" alt="Affan Khan">
+      </div>
+      <div class="title">
+        <h1>Affan Khan</h1>
+        <p class="muted">Third-year B.Tech student at MBU • CX Associate • Java & IoT Developer • Freelance Video Editor • Professional Redditor (Memelord)</p>
+        <div class="neon-badge">Open to freelance & internships</div>
+      </div>
+    </header>
+
+    <main class="grid">
+      <section>
+        <div class="card">
+          <h2>About</h2>
+          <p>I'm a third-year student at <strong>MBU</strong> building practical solutions with <strong>Java, SQL, and IoT</strong>. I enjoy video editing, event management, and hands-on projects that matter.</p>
+          <div style="height:12px"></div>
+          <h3>Quick facts</h3>
+          <div class="list">
+            <div class="muted">Education: Third year — B.Tech (MBU)</div>
+            <div class="muted">Roles: CX Associate, Freelance Video Editor, ISTE management team</div>
+            <div class="muted">Soft skills: Public speaking • Event organizer • Part-time teacher • Canva</div>
+            <div class="muted">Reddit: Professional Redditor since 5 years — Memelord</div>
+          </div>
+        </div>
+
+        <div style="height:16px"></div>
+
+        <div class="card">
+          <h2>Projects</h2>
+          <div class="projects">
+            <div class="project">
+              <div class="glow"></div>
+              <h3>Employee Productivity & Task Management System</h3>
+              <p class="muted">Tech: Java, SQL</p>
+              <p>Built a system to assign, monitor and report employee tasks and productivity metrics. Implemented database-backed task flows and performance summaries.</p>
+            </div>
+
+            <div class="project">
+              <div class="glow"></div>
+              <h3>Air Pollution Monitoring (IoT)</h3>
+              <p class="muted">Tech: IoT sensors, microcontroller, cloud logging</p>
+              <p>Designed an IoT solution to measure air quality inside factories, log readings, and trigger alerts for unsafe levels — aiming for improved workplace safety.</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:16px"></div>
+
+        <div class="card">
+          <h2>Skills</h2>
+          <div class="skills">
+            <span class="pill">HTML</span>
+            <span class="pill">CSS</span>
+            <span class="pill">JavaScript</span>
+            <span class="pill">Java</span>
+            <span class="pill">C</span>
+            <span class="pill">C++</span>
+            <span class="pill">SQL</span>
+            <span class="pill">IoT</span>
+            <span class="pill">Video Editing</span>
+            <span class="pill">Canva</span>
+          </div>
+        </div>
+
+        <div style="height:16px"></div>
+
+        <div class="card">
+          <h2>Hobbies & Achievements</h2>
+          <p class="muted">Karate: National — 1 Gold, 2 Silver medals</p>
+          <p class="muted">Gaming: BGMI — Ace Dominator & Ace Master (twice); active since Season 3</p>
+          <p class="muted">Cooking: Semi-professional cook • Enjoys trying new recipes</p>
+          <p class="muted">Other: Working out, Cricket, Football, Watching documentaries</p>
+        </div>
+
+      </section>
+
+      <aside>
+        <div class="card">
+          <h2>Experience</h2>
+          <div class="list">
+            <div class="job">
+              <strong>CX Associate</strong>
+              <div class="muted">Customer experience & support — handled client queries, coordination, and service operations.</div>
+            </div>
+            <div class="job">
+              <strong>Freelance Video Editor</strong>
+              <div class="muted">Edited promotional and event videos for clients. Skilled with timelines, cuts, and basic motion graphics.</div>
+            </div>
+            <div class="job">
+              <strong>ISTE — Management Team</strong>
+              <div class="muted">Member of institute student technical events & management team.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="height:16px"></div>
+
+        <div class="card">
+          <h2>Contact</h2>
+          <p class="muted">Phone: +91 7075091781</p>
+          <p class="muted">Email: <a href="mailto:affankhame@gmail.com">affankhame@gmail.com</a></p>
+          <p class="muted">LinkedIn: <a href="#">linkedin.com/in/affankhan</a></p>
+          <p class="muted">GitHub: <a href="#">github.com/affankhan</a></p>
+          <div style="height:8px"></div>
+          <button class="btn neon" onclick="copyEmail()">Copy Email</button>
+        </div>
+
+        <div style="height:16px"></div>
+
+        <div class="card">
+          <h2>Availability</h2>
+          <p class="muted">Open for freelance video editing, internships (software/IoT), and part-time teaching.</p>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      <div class="muted">Made with ❤️ — Affan Khan • Design: Neon theme, smooth transitions & animated profile</div>
+    </footer>
+  </div>
+
+  <script>
+    function copyEmail(){
+      navigator.clipboard?.writeText('affankhame@gmail.com').then(()=>{
+        alert('Email copied to clipboard');
+      }).catch(()=>{alert('Copy failed — please copy manually')});
+    }
+  </script>
+</body>
+</html>

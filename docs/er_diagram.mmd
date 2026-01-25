@@ -1,0 +1,19 @@
+%% Mermaid ER Diagram for Knowledge Sharing Tech Community
+erDiagram
+    USERS ||--o{ POSTS : authors
+    USERS ||--o{ COMMENTS : authors
+    POSTS ||--o{ COMMENTS : has
+    POSTS ||--o{ POST_TAGS : relation
+    TAGS ||--o{ POST_TAGS : relation
+    USERS ||--o{ LIKES : likes
+    POSTS ||--o{ LIKES : likes
+    USERS ||--o{ FOLLOWERS : follows
+    USERS ||--o{ MENTORSHIPS : mentor_of
+    USERS ||--o{ MENTORSHIPS : mentee_of
+    USERS ||--o{ SLOTS : provides
+    SLOTS ||--o{ BOOKINGS : booked
+    USERS ||--o{ BOOKINGS : books
+    CONVERSATIONS ||--o{ MESSAGES : contains
+    USERS ||--o{ CONVERSATION_MEMBERS : member_of
+
+%% Use mermaid live or VS Code Mermaid preview to render diagram

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Dashboard — Knowledge Sharing</title>
+  <link rel="stylesheet" href="index.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-neutral-950 text-neutral-200 noise">
+
+  <!-- Background glow -->
+  <div class="absolute inset-0 bg-glow"></div>
+
+  <div class="relative flex">
+    <!-- Sidebar -->
+    <aside class="hidden md:flex w-64 flex-col gap-4 p-4 glass sticky top-4 h-[calc(100vh-2rem)] m-4">
+      <a href="index.html" class="flex items-center gap-3">
+        <span class="inline-grid place-items-center w-10 h-10 rounded-xl bg-gradient-to-br from-brand-500 via-fuchsia-500 to-accent-600 text-white font-extrabold">K</span>
+        <span class="font-display font-semibold">Knowledge Sharing</span>
+      </a>
+
+      <nav class="mt-4 space-y-1 text-sm flex-1">
+        <p class="text-neutral-400 px-3 uppercase tracking-wider text-xs">General</p>
+        <a class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/5" href="dashboard.html">🏠 Overview</a>
+        <a class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/5" href="posts.html">📝 Posts</a>
+        <a class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/5" href="messages.html">💬 Messages</a>
+        <a class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/5" href="schedule.html">🗓 Schedule</a>
+
+        <p class="text-neutral-400 px-3 uppercase tracking-wider text-xs mt-4">Mentor</p>
+        <a class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/5" data-role="MENTOR" href="mentor-slots.html">Slots</a>
+        <a class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/5" data-role="MENTOR" href="mentor-requests.html">Requests</a>
+
+        <p class="text-neutral-400 px-3 uppercase tracking-wider text-xs mt-4">Admin</p>
+        <a class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/5" data-role="ADMIN" href="admin.html">Analytics</a>
+        <a class="flex items-center gap-2 px-3 py-2 rounded-xl hover:bg-white/5" data-role="ADMIN" href="admin-users.html">Users</a>
+      </nav>
+
+      <div class="mt-auto p-3 border-t border-white/10">
+        <div id="mini-profile" class="flex items-center gap-3">
+          <div class="w-8 h-8 rounded-full bg-neutral-800"></div>
+          <div class="text-sm">
+            <p id="mini-email" class="text-white">you@example.com</p>
+            <p id="mini-role" class="text-neutral-400">Member</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main content -->
+    <div class="flex-1 min-w-0 p-4 md:p-6">
+      <!-- Topbar -->
+      <header class="glass rounded-2xl border border-white/10 px-4 py-3 mb-4 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <button id="menu-toggle" class="md:hidden px-3 py-2 rounded-xl border border-white/10">☰</button>
+          <div class="relative hidden md:block">
+            <input id="global-search" type="text" placeholder="Search posts, members, events…" class="w-72 rounded-xl bg-neutral-900 border border-white/10 px-3 py-2 text-sm" />
+            <button id="searchBtn" class="absolute right-1 top-1/2 -translate-y-1/2 px-2 text-neutral-400">🔎</button>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <button id="themeToggle" class="px-3 py-2 rounded-xl border border-white/10">Theme</button>
+          <button id="notifBtn" class="px-3 py-2 rounded-xl border border-white/10">🔔</button>
+          <div id="userMenu" class="flex items-center gap-3">
+            <div id="top-avatar" class="w-8 h-8 rounded-full bg-neutral-800"></div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Page content -->
+      <main id="page" class="space-y-8">
+
+        <!-- Overview Widgets -->
+        <section>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold">Overview</h2>
+            <div class="text-sm text-neutral-400">Welcome back — here's what's happening</div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+            <div class="p-5 rounded-2xl bg-neutral-900 border border-white/10">
+              <p class="text-sm text-neutral-400">Members</p>
+              <p id="stat-members" class="mt-2 text-2xl font-bold">—</p>
+            </div>
+            <div class="p-5 rounded-2xl bg-neutral-900 border border-white/10">
+              <p class="text-sm text-neutral-400">Projects</p>
+              <p id="stat-projects" class="mt-2 text-2xl font-bold">—</p>
+            </div>
+            <div class="p-5 rounded-2xl bg-neutral-900 border border-white/10">
+              <p class="text-sm text-neutral-400">Mentorships</p>
+              <p id="stat-mentorships" class="mt-2 text-2xl font-bold">—</p>
+            </div>
+            <div class="p-5 rounded-2xl bg-neutral-900 border border-white/10">
+              <p class="text-sm text-neutral-400">Events</p>
+              <p id="stat-events" class="mt-2 text-2xl font-bold">—</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Tabs: Messages / Schedule -->
+        <section>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-xl font-semibold">Workspace</h3>
+            <div class="flex gap-2">
+              <button id="tab-overview" class="px-3 py-1 rounded-xl bg-neutral-800 border border-white/10">Overview</button>
+              <button id="tab-messages" class="px-3 py-1 rounded-xl border border-white/10">Messages</button>
+              <button id="tab-schedule" class="px-3 py-1 rounded-xl border border-white/10">Schedule</button>
+            </div>
+          </div>
+
+          <div id="tab-content" class="space-y-6">
+            <!-- Default overview content -->
+            <div id="panel-overview">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="col-span-2 p-4 rounded-2xl bg-neutral-900 border border-white/10">
+                  <h4 class="font-semibold mb-3">Recent posts</h4>
+                  <div id="recent-posts" class="space-y-3">
+                    <!-- populated by JS -->
+                  </div>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-neutral-900 border border-white/10">
+                  <h4 class="font-semibold mb-3">Upcoming meetings</h4>
+                  <div id="upcoming-meetings" class="space-y-3">
+                    <!-- populated by JS -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Messages panel -->
+            <div id="panel-messages" class="hidden">
+              <!-- Messaging two-column layout -->
+              <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="md:col-span-1 rounded-2xl bg-neutral-900 border border-white/10 overflow-hidden">
+                  <div class="p-3 border-b border-white/10">
+                    <input id="thread-search" class="w-full rounded-xl bg-neutral-800 border border-white/10 px-3 py-2 text-sm" placeholder="Search people…" />
+                  </div>
+                  <ul id="threadList" class="divide-y divide-white/5 max-h-[60vh] overflow-auto p-2"></ul>
+                </div>
+
+                <div class="md:col-span-2 rounded-2xl bg-neutral-900 border border-white/10 flex flex-col">
+                  <header id="chatHeader" class="p-3 border-b border-white/10 flex items-center gap-3">
+                    <div id="chat-avatar" class="w-10 h-10 rounded-full bg-neutral-800"></div>
+                    <div>
+                      <p id="chat-name" class="font-semibold">Select a conversation</p>
+                      <p id="chat-status" class="text-xs text-neutral-400">—</p>
+                    </div>
+                  </header>
+
+                  <div id="chatBody" class="flex-1 overflow-auto p-4 space-y-3 min-h-[220px]">
+                    <div class="text-neutral-400 text-sm">No conversation selected</div>
+                  </div>
+
+                  <form id="chatForm" class="p-3 border-t border-white/10 flex items-center gap-2">
+                    <input id="chatInput" class="flex-1 rounded-xl bg-neutral-800 border border-white/10 px-3 py-2 text-sm" placeholder="Type a message…" />
+                    <button id="sendBtn" class="btn px-4 py-2 rounded-xl">Send</button>
+                  </form>
+                </div>
+              </section>
+            </div>
+
+            <!-- Schedule panel -->
+            <div id="panel-schedule" class="hidden">
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <div class="lg:col-span-2 p-4 rounded-2xl bg-neutral-900 border border-white/10">
+                  <h4 class="font-semibold mb-3">Available slots</h4>
+                  <div id="slotGrid" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-neutral-900 border border-white/10">
+                  <h4 class="font-semibold mb-3">Create slot</h4>
+                  <form id="slotForm" class="grid grid-cols-1 gap-3">
+                    <input id="slot-start" type="datetime-local" class="rounded-xl bg-neutral-800 border border-white/10 px-3 py-2" />
+                    <input id="slot-end" type="datetime-local" class="rounded-xl bg-neutral-800 border border-white/10 px-3 py-2" />
+                    <button id="createSlotBtn" class="btn">Create Slot</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast" class="fixed right-4 bottom-6 z-50"></div>
+
+  <!-- Scripts -->
+  <script src="js/common.js"></script>
+  <script src="js/messages.js"></script>
+  <script src="js/slots.js"></script>
+
+  <script>
+    // Basic tab handling
+    const tOverview = document.getElementById('tab-overview');
+    const tMessages = document.getElementById('tab-messages');
+    const tSchedule = document.getElementById('tab-schedule');
+    const pOverview = document.getElementById('panel-overview');
+    const pMessages = document.getElementById('panel-messages');
+    const pSchedule = document.getElementById('panel-schedule');
+
+    tOverview.addEventListener('click', () => { pOverview.classList.remove('hidden'); pMessages.classList.add('hidden'); pSchedule.classList.add('hidden'); });
+    tMessages.addEventListener('click', () => { pOverview.classList.add('hidden'); pMessages.classList.remove('hidden'); pSchedule.classList.add('hidden'); Messages.init(); });
+    tSchedule.addEventListener('click', () => { pOverview.classList.add('hidden'); pMessages.classList.add('hidden'); pSchedule.classList.remove('hidden'); Slots.init(); });
+
+    // Init status: load overview data
+    (async () => {
+      // show mini profile email & role
+      const email = localStorage.getItem('userEmail') || 'you@example.com';
+      const role = localStorage.getItem('role') || 'MEMBER';
+      document.getElementById('mini-email').textContent = email;
+      document.getElementById('mini-role').textContent = role;
+
+      // role-based hide
+      roleGuard();
+
+      // fetch some basic stats from available endpoints
+      try {
+        // members count via /users
+        const usersRes = await fetch('http://localhost:4000/users');
+        const users = usersRes.ok ? await usersRes.json() : [];
+        document.getElementById('stat-members').textContent = (Array.isArray(users) ? users.length : '—');
+
+        // posts count via /api/posts (public)
+        let postsCount = '—';
+        try {
+          const postsRes = await fetch('http://localhost:4000/api/posts');
+          if (postsRes.ok) {
+            const posts = await postsRes.json();
+            postsCount = Array.isArray(posts) ? posts.length : '—';
+            // render recent posts in overview
+            const recent = posts.slice(0,3);
+            const container = document.getElementById('recent-posts');
+            container.innerHTML = '';
+            recent.forEach(p => {
+              const el = document.createElement('div');
+              el.className = 'p-3 rounded-lg bg-neutral-800 border border-white/5';
+              el.innerHTML = `<div class="font-semibold">${p.title || 'Untitled'}</div><div class="text-xs text-neutral-400 mt-1">By ${p.authorId || '—'}</div>`;
+              container.appendChild(el);
+            });
+          }
+        } catch(e){}
+        document.getElementById('stat-projects').textContent = postsCount;
+
+        // mentorships / events — fallback dummy counts
+        document.getElementById('stat-mentorships').textContent = '—';
+        document.getElementById('stat-events').textContent = '—';
+      } catch (err) { console.error(err); }
+    })();
+  </script>
+</body>
+</html>
