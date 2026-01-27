@@ -15,189 +15,25 @@ enum Role {
   MENTOR
 }
 
-enum SlotStatus {
-  OPEN
-  BOOKED
-  CANCELLED
-}
-
-enum MeetingStatus {
-  SCHEDULED
-  STARTED
-  ENDED
-  CANCELLED
-}
-
-enum ActivityType {
-  POST_CREATED
-  POST_LIKED
-  COMMENT_CREATED
-  EVENT_CREATED
-  EVENT_JOINED
-  USER_FOLLOWED
-  USER_UNFOLLOWED
-  POST_SAVED
-  POST_APPROVED
-  POST_REJECTED
-}
-
-enum PostStatus {
-  PENDING
-  APPROVED
-  REJECTED
-}
-
 /* ================= USER ================= */
 
 model User {
-  id                  Int                  @id @default(autoincrement())
+  id                  Int      @id @default(autoincrement())
   name                String
-  email               String               @unique
+  email               String   @unique
   password            String
   bio                 String?
   skills              String?
   profileImage        String?
-  role                Role                 @default(USER)
-  isActive            Boolean              @default(true)
-  deletedAt           DateTime?
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
+  role                Role     @default(USER)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
-  posts               Post[]
-  comments            Comment[]
-  likes               Like[]
-  commentLikes        CommentLike[]
-  followers           Follower[]           @relation("UserFollowers")
-  following           Follower[]           @relation("UserFollowing")
-  mentorshipsAsMentor Mentorship[]         @relation("MentorRelation")
-  mentorshipsAsMentee Mentorship[]         @relation("MenteeRelation")
-  slots               Slot[]
-  bookings            Booking[]
-  reports             Report[]
-  activities          Activity[]
-
-  conversations       ConversationMember[]
-  messages            Message[]
-  events              Event[]
-  eventAttendees      EventAttendee[]
+  // Mentorship relations
+  mentorshipsAsMentor Mentorship[] @relation("MentorRelation")
+  mentorshipsAsMentee Mentorship[] @relation("MenteeRelation")
 
   @@index([email])
-}
-
-/* ================= ACTIVITY ================= */
-
-model Activity {
-  id        Int          @id @default(autoincrement())
-  type      ActivityType
-  message   String
-  userId    Int
-  entity    String?
-  entityId  Int?
-  createdAt DateTime     @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([entity, entityId])
-}
-
-/* ================= POSTS ================= */
-
-model Post {
-  id        Int        @id @default(autoincrement())
-  title     String
-  content   String
-  image     String?
-  authorId  Int
-  status    PostStatus @default(PENDING)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-
-  author   User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  comments Comment[]
-  likes    Like[]
-  tags     PostTag[]
-  reports  Report[]
-}
-
-/* ================= LIKES ================= */
-
-model Like {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  postId    Int
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, postId])
-}
-
-/* ================= COMMENTS ================= */
-
-model Comment {
-  id              Int       @id @default(autoincrement())
-  content         String
-  authorId        Int
-  postId          Int
-  parentCommentId Int?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  author       User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  post         Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
-  parent       Comment? @relation("CommentReplies", fields: [parentCommentId], references: [id])
-  replies      Comment[] @relation("CommentReplies")
-  commentLikes CommentLike[]
-
-  @@index([authorId])
-  @@index([postId])
-}
-
-/* ================= COMMENT LIKES ================= */
-
-model CommentLike {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  commentId Int
-  createdAt DateTime @default(now())
-
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  comment Comment @relation(fields: [commentId], references: [id], onDelete: Cascade)
-
-  @@unique([userId, commentId])
-}
-
-/* ================= TAGS ================= */
-
-model Tag {
-  id    Int       @id @default(autoincrement())
-  name  String    @unique
-  posts PostTag[]
-}
-
-model PostTag {
-  postId Int
-  tagId  Int
-
-  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
-  tag  Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
-
-  @@id([postId, tagId])
-}
-
-/* ================= FOLLOWERS ================= */
-
-model Follower {
-  id          Int @id @default(autoincrement())
-  followerId  Int
-  followingId Int
-
-  follower  User @relation("UserFollowers", fields: [followerId], references: [id], onDelete: Cascade)
-  following User @relation("UserFollowing", fields: [followingId], references: [id], onDelete: Cascade)
-
-  @@unique([followerId, followingId])
 }
 
 /* ================= MENTORSHIP ================= */
@@ -206,8 +42,8 @@ model Mentorship {
   id            Int      @id @default(autoincrement())
   mentorId      Int
   menteeId      Int
-  status        String   @default("pending")
-  topic         String?
+  topic         String
+  status        String   @default("pending") // "pending", "accepted", "rejected", "cancelled"
   preferredSlot DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -217,120 +53,4 @@ model Mentorship {
 
   @@index([mentorId])
   @@index([menteeId])
-}
-
-/* ================= SLOTS ================= */
-
-model Slot {
-  id        String     @id @default(uuid())
-  mentorId  Int
-  startAt   DateTime
-  endAt     DateTime
-  status    SlotStatus @default(OPEN)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-
-  mentor  User     @relation(fields: [mentorId], references: [id], onDelete: Cascade)
-  booking Booking?
-  meeting Meeting?
-
-  @@index([mentorId, startAt])
-}
-
-model Booking {
-  id        String   @id @default(uuid())
-  slotId    String   @unique
-  menteeId  Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  slot   Slot @relation(fields: [slotId], references: [id], onDelete: Cascade)
-  mentee User @relation(fields: [menteeId], references: [id], onDelete: Cascade)
-
-  @@index([menteeId])
-}
-
-model Meeting {
-  id        String        @id @default(uuid())
-  slotId    String        @unique
-  meetUrl   String?
-  status    MeetingStatus @default(SCHEDULED)
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-
-  slot Slot @relation(fields: [slotId], references: [id], onDelete: Cascade)
-}
-
-/* ================= REPORTS ================= */
-
-model Report {
-  id        Int      @id @default(autoincrement())
-  reason    String
-  postId    Int?
-  userId    Int?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  post Post? @relation(fields: [postId], references: [id], onDelete: Cascade)
-  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-/* ================= CHAT ================= */
-
-model Conversation {
-  id        String               @id
-  createdAt DateTime             @default(now())
-  members   ConversationMember[]
-  messages  Message[]
-}
-
-model ConversationMember {
-  conversationId String
-  userId         Int
-
-  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([conversationId, userId])
-}
-
-model Message {
-  id             String       @id
-  conversationId String
-  senderId       Int?
-  body           String
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-
-  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender       User?        @relation(fields: [senderId], references: [id], onDelete: Cascade)
-}
-
-/* ================= EVENTS ================= */
-
-model Event {
-  id          Int             @id @default(autoincrement())
-  name        String
-  description String?
-  location    String?
-  startsAt    DateTime?
-  endsAt      DateTime?
-  createdById Int
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-
-  creator   User            @relation(fields: [createdById], references: [id])
-  attendees EventAttendee[]
-
-  @@index([createdById])
-}
-
-model EventAttendee {
-  eventId Int
-  userId  Int
-
-  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@id([eventId, userId])
 }
