@@ -1,97 +1,35 @@
-
-
-// import express from "express";
-// import { authenticate } from "../middleware/authMiddleware.js";
-// import { authorizeRoles } from "../middleware/authorizeRoles.js";
-// import {
-//   getPosts,
-//   createPost,
-//   likePost,
-//   createComment,
-//   getComments,
-//   likeComment,
-//   deletePost,
-//   deleteComment,
-// } from "../controllers/postController.js";
-
-// const router = express.Router();
-
-// /* ================= POSTS ================= */
-
-// // ✅ PUBLIC FEED
-// router.get("/", getPosts);
-
-// // 🔐 CREATE POST
-// router.post(
-//   "/",
-//   authenticate,
-//   authorizeRoles("ADMIN", "MENTOR", "USER"),
-//   createPost
-// );
-
-// // 🔐 LIKE POST
-// router.post("/:id/like", authenticate, likePost);
-
-// /* ================= COMMENTS ================= */
-
-// router.post("/comment", authenticate, createComment);
-// router.get("/comment/:postId", authenticate, getComments);
-// router.post("/comment/:commentId/like", authenticate, likeComment);
-
-// /* ================= DELETE ================= */
-
-// router.delete("/:id", authenticate, deletePost);
-// router.delete("/comment/:commentId", authenticate, deleteComment);
-
-// export default router;
-
-
-
-import express from "express";
-import { authenticate } from "../middleware/authMiddleware.js";
-import { authorizeRoles } from "../middleware/authorizeRoles.js";
-import {
-  getPosts,
-  getPostById,
-  createPost,
-  likePost,
-  createComment,
-  getComments,
-  likeComment,
-  deletePost,
-  deleteComment,
-} from "../controllers/postController.js";
+import express from 'express';
+import { authenticate } from '../middleware/index.js';
+import OptimizedPostController from '../controllers/optimizedPostController.js';
+import PostController from '../controllers/postController.js';
+import { upload, handleUploadError } from '../middleware/upload.js';
 
 const router = express.Router();
+const optimizedController = new OptimizedPostController();
 
-/* ================= POSTS ================= */
+// Public routes - specific routes first
+router.get('/', optimizedController.getPostsOptimized);
+router.get('/compare-performance', optimizedController.comparePerformance);
+router.get('/search', PostController.searchPosts);
+router.get('/cursor', PostController.getPostsWithCursor);
+router.get('/author/:authorId', PostController.getPostsByAuthor);
+// Parameterized routes last
+router.get('/:id', PostController.getById);
+router.get('/:id/comments', PostController.getComments); // Public GET comments
 
-// ✅ PUBLIC FEED
-router.get("/", getPosts);
+// Protected routes (require authentication)
+router.use(authenticate);
 
-// ✅ POST DETAIL
-router.get("/:id", getPostById);
+// CRUD operations (protected)
+router.post('/', upload.single('image'), handleUploadError, PostController.create);
+router.put('/:id', PostController.updatePost);
+router.delete('/:id', PostController.deletePost);
 
-// 🔐 CREATE POST
-router.post(
-  "/",
-  authenticate,
-  authorizeRoles("ADMIN", "MENTOR", "USER"),
-  createPost
-);
+// Like operations (protected)
+router.post('/:id/like', PostController.likePost);
 
-// 🔐 LIKE POST
-router.post("/:id/like", authenticate, likePost);
-
-/* ================= COMMENTS ================= */
-
-router.post("/comment", authenticate, createComment);
-router.get("/comment/:postId", authenticate, getComments);
-router.post("/comment/:commentId/like", authenticate, likeComment);
-
-/* ================= DELETE ================= */
-
-router.delete("/:id", authenticate, deletePost);
-router.delete("/comment/:commentId", authenticate, deleteComment);
+// Comment operations (protected)
+router.post('/:id/comments', PostController.addComment);
+router.post('/:id/comment', PostController.addComment); // Keep for backward compatibility
 
 export default router;

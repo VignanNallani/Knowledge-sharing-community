@@ -1,38 +1,41 @@
-// import { StrictMode } from 'react'
-// import { createRoot } from 'react-dom/client'
-// import { BrowserRouter } from 'react-router-dom'
-// import './index.css'
-// import App from './App.jsx'
-// import ToastProvider from './components/ToastProvider'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { BrowserRouter } from 'react-router-dom';
+import App from './App.jsx';
+import { AuthProvider } from './context/AuthContext.jsx';
+import { SocketProvider } from './context/SocketProvider.jsx';
+import ToastProvider from './components/ToastProvider.jsx';
+import GlobalToastProvider from './components/GlobalToastProvider.jsx';
+import OfflineBanner from './components/OfflineBanner.jsx';
+import ErrorBoundary from './components/ErrorBoundary.jsx';
+import { Suspense } from 'react';
+import ConnectionBanner from './components/ConnectionBanner';
+import './index.css';
 
-// createRoot(document.getElementById('root')).render(
-//   <StrictMode>
-//     <BrowserRouter>
-//       <ToastProvider>
-//         <App />
-//       </ToastProvider>
-//     </BrowserRouter>
-//   </StrictMode>,
-// )
+// Environment validation
+import { validateEnv } from './utils/env';
+if (!validateEnv()) {
+  console.error('Application startup failed due to missing environment variables');
+}
 
-
-
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
-import "./index.css";
-import App from "./App.jsx";
-import ToastProvider from "./components/ToastProvider";
-import { AuthProvider } from "./context/AuthContext";
-
-createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <BrowserRouter>
-      <AuthProvider>
-        <ToastProvider>
-          <App />
-        </ToastProvider>
-      </AuthProvider>
-    </BrowserRouter>
-  </StrictMode>
-);
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <ErrorBoundary>
+      <BrowserRouter
+        future={{
+          v7_startTransition: true,
+          v7_relativeSplatPath: true
+        }}
+      >
+        <AuthProvider>
+          <SocketProvider>
+            <ConnectionBanner />
+            <ToastProvider>
+              <App />
+            </ToastProvider>
+          </SocketProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
+  </React.StrictMode>,
+)

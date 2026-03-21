@@ -1,0 +1,119 @@
+/**
+ * Moderation System Constants
+ * Week-3 Ownership Feature Build
+ * Production-grade moderation with full lifecycle
+ */
+
+export const REPORT_SEVERITY = {
+  LOW: 'LOW',
+  MEDIUM: 'MEDIUM',
+  HIGH: 'HIGH',
+  CRITICAL: 'CRITICAL'
+};
+
+export const REPORT_STATUS = {
+  PENDING: 'PENDING',
+  UNDER_REVIEW: 'UNDER_REVIEW',
+  RESOLVED: 'RESOLVED',
+  DISMISSED: 'DISMISSED',
+  ESCALATED: 'ESCALATED'
+};
+
+export const CASE_STATE = {
+  OPEN: 'OPEN',
+  ASSIGNED: 'ASSIGNED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  PENDING_REVIEW: 'PENDING_REVIEW',
+  RESOLVED: 'RESOLVED',
+  CLOSED: 'CLOSED'
+};
+
+export const ACTION_TYPE = {
+  WARNING: 'WARNING',
+  CONTENT_REMOVAL: 'CONTENT_REMOVAL',
+  USER_SUSPENSION: 'USER_SUSPENSION',
+  USER_BAN: 'USER_BAN',
+  TRUST_DEDUCTION: 'TRUST_DEDUCTION',
+  ESCALATE: 'ESCALATE',
+  NOTES_ONLY: 'NOTES_ONLY'
+};
+
+export const TRUST_LEVEL = {
+  NEW: 'NEW',
+  ESTABLISHED: 'ESTABLISHED',
+  TRUSTED: 'TRUSTED',
+  VIP: 'VIP',
+  RESTRICTED: 'RESTRICTED',
+  SUSPENDED: 'SUSPENDED'
+};
+
+export const APPEAL_STATUS = {
+  SUBMITTED: 'SUBMITTED',
+  UNDER_REVIEW: 'UNDER_REVIEW',
+  APPROVED: 'APPROVED',
+  DENIED: 'DENIED',
+  ESCALATED: 'ESCALATED'
+};
+
+export const FLAG_TYPE = {
+  SPAM: 'SPAM',
+  INAPPROPRIATE: 'INAPPROPRIATE',
+  HARASSMENT: 'HARASSMENT',
+  MISINFORMATION: 'MISINFORMATION',
+  VIOLENCE: 'VIOLENCE',
+  COPYRIGHT: 'COPYRIGHT',
+  OTHER: 'OTHER'
+};
+
+export const CONTENT_TYPE = {
+  POST: 'post',
+  COMMENT: 'comment',
+  USER: 'user'
+};
+
+export const LOG_TYPE = {
+  CASE_CREATED: 'case_created',
+  ACTION_TAKEN: 'action_taken',
+  APPEAL_FILED: 'appeal_filed',
+  REPORT_SUBMITTED: 'report_submitted',
+  TRUST_UPDATED: 'trust_updated',
+  FLAG_GENERATED: 'flag_generated',
+  CASE_ASSIGNED: 'case_assigned',
+  CASE_ESCALATED: 'case_escalated'
+};
+
+export const MODERATOR_ROLES = {
+  MODERATOR: 'MODERATOR',
+  ADMIN: 'ADMIN',
+  SUPER_ADMIN: 'SUPER_ADMIN'
+};
+
+export const TRUST_THRESHOLDS = {
+  VIP: 90,
+  TRUSTED: 75,
+  ESTABLISHED: 60,
+  NEW: 40,
+  RESTRICTED: 20,
+  SUSPENDED: 0
+};
+
+export const AUTO_FLAG_THRESHOLDS = {
+  SPAM_CONFIDENCE: 85,
+  HARASSMENT_CONFIDENCE: 90,
+  INAPPROPRIATE_CONFIDENCE: 80,
+  MISINFORMATION_CONFIDENCE: 75
+};
+
+export const SUSPENSION_DURATIONS = {
+  WARNING: 0,
+  SHORT: 1, // 1 day
+  MEDIUM: 7, // 1 week
+  LONG: 30, // 1 month
+  PERMANENT: -1 // indefinite
+};
+
+export const RATE_LIMITS = {
+  REPORTS_PER_HOUR: 5,
+  APPEALS_PER_WEEK: 3,
+  ACTIONS_PER_HOUR: 20
+};

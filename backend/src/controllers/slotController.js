@@ -1,54 +1,51 @@
-import { PrismaClient } from '@prisma/client'
+import ApiResponse from '../utils/ApiResponse.js';
+import { ApiError } from '../utils/ApiError.js';
+import asyncHandler from '../middleware/asyncHandler.js';
+import slotService from '../services/slot.service.js';
+import { Response } from '../utils/ResponseBuilder.js';
 
-const prisma = new PrismaClient()
+export const createSlot = asyncHandler(async (req, res) => {
+  const mentorId = req.user.id;
+  const slot = await slotService.createSlot(req.body, mentorId);
+  return Response.created(res, slot, 'Slot created successfully');
+});
 
-export const createSlot = async (req, res) => {
-  try {
-    const mentorId = req.user.id
-    const { start, end } = req.body
-    if (!start || !end) return res.status(400).json({ error: 'start and end are required' })
-    const s = new Date(start)
-    const e = new Date(end)
-    if (isNaN(s) || isNaN(e) || s >= e) return res.status(400).json({ error: 'Invalid start/end' })
+export const listSlots = asyncHandler(async (req, res) => {
+  const result = await slotService.getSlots(req.query);
+  return Response.paginated(res, result.slots, {
+    page: result.page,
+    limit: result.totalPages > 0 ? result.slots.length : 0,
+    total: result.total
+  }, 'Slots fetched successfully');
+});
 
-    const slot = await prisma.slot.create({ data: { mentorId, start: s, end: e } })
-    res.status(201).json({ message: 'Slot created', slot })
-  } catch (err) {
-    console.error('Create slot error:', err)
-    res.status(500).json({ error: 'Failed to create slot' })
+export const bookSlot = asyncHandler(async (req, res) => {
+  const menteeId = req.user.id;
+  const { slotId } = req.body;
+  
+  if (!slotId) {
+    throw new ApiError(400, 'slotId is required');
   }
-}
 
-export const listSlots = async (req, res) => {
-  try {
-    const { mentorId } = req.query
-    const where = { status: 'OPEN' }
-    if (mentorId) where.mentorId = Number(mentorId)
-    const slots = await prisma.slot.findMany({ where, orderBy: { start: 'asc' } })
-    res.json({ slots })
-  } catch (err) {
-    console.error('List slots error:', err)
-    res.status(500).json({ error: 'Failed to list slots' })
-  }
-}
+  const booking = await slotService.bookSlot(slotId, menteeId);
+  return Response.created(res, booking, 'Slot booked successfully');
+});
 
-export const bookSlot = async (req, res) => {
-  try {
-    const menteeId = req.user.id
-    const { slotId } = req.body
-    if (!slotId) return res.status(400).json({ error: 'slotId required' })
+export const cancelSlot = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const { slotId } = req.params;
+  
+  const result = await slotService.cancelSlot(slotId, userId);
+  return Response.success(res, result, 'Slot cancelled successfully');
+});
 
-    const slot = await prisma.slot.findUnique({ where: { id: slotId } })
-    if (!slot) return res.status(404).json({ error: 'Slot not found' })
-    if (slot.status !== 'OPEN') return res.status(400).json({ error: 'Slot not available' })
-
-    // create booking and update slot status
-    const booking = await prisma.booking.create({ data: { slotId: slot.id, menteeId } })
-    await prisma.slot.update({ where: { id: slot.id }, data: { status: 'BOOKED' } })
-
-    res.status(201).json({ message: 'Slot booked', booking })
-  } catch (err) {
-    console.error('Book slot error:', err)
-    res.status(500).json({ error: 'Failed to book slot' })
-  }
-}
+export const getMySlots = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const result = await slotService.getMySlots(userId, req.query);
+  
+  return Response.paginated(res, result.slots, {
+    page: result.page,
+    limit: result.totalPages > 0 ? result.slots.length : 0,
+    total: result.total
+  }, 'My slots fetched successfully');
+});

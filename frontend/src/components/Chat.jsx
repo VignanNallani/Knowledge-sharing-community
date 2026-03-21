@@ -1,30 +1,23 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { io } from 'socket.io-client';
+import { socket } from '../socket';
 import api from '../api/axios';
 
-const SOCKET_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
-
 export default function Chat({ conversationId, user }) {
-  const [socket, setSocket] = useState(null);
   const [messages, setMessages] = useState([]);
   const [text, setText] = useState('');
   const listRef = useRef(null);
 
   useEffect(() => {
-    const s = io(SOCKET_URL);
-    setSocket(s);
-    return () => s.disconnect();
-  }, []);
-
-  useEffect(() => {
     if (!socket || !conversationId) return;
+    
     socket.emit('join', conversationId);
     socket.on('message', (m) => setMessages((prev) => [...prev, m]));
+    
     return () => {
       socket.off('message');
       socket.emit('leave', conversationId);
     };
-  }, [socket, conversationId]);
+  }, [conversationId]);
 
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;

@@ -1,767 +1,395 @@
 
-
-
-
-
-// import { PrismaClient, ActivityType } from "@prisma/client";
-// import { logActivity } from "../services/activityService.js";
-
-// const prisma = new PrismaClient();
-
-// /* ================= GET POSTS ================= */
-// export const getPosts = async (req, res) => {
-//   const page = parseInt(req.query.page) || 1;
-//   const limit = parseInt(req.query.limit) || 10;
-//   const skip = (page - 1) * limit;
-
-//   try {
-//     const posts = await prisma.post.findMany({
-//       where: { status: "APPROVED" }, // 🔥 moderation
-//       skip,
-//       take: limit,
-//       orderBy: { createdAt: "desc" },
-//       include: {
-//         author: { select: { id: true, name: true, profileImage: true } },
-//         likes: true,
-//         comments: {
-//           where: { parentCommentId: null },
-//           include: {
-//             author: true,
-//             commentLikes: true,
-//             replies: {
-//               include: { author: true, commentLikes: true },
-//             },
-//           },
-//         },
-//         tags: { include: { tag: true } },
-//       },
-//     });
-
-//     const totalPosts = await prisma.post.count({
-//       where: { status: "APPROVED" },
-//     });
-
-//     res.json({
-//       posts: posts.map((p) => ({
-//         ...p,
-//         likeCount: p.likes.length,
-//         commentCount: p.comments.length,
-//         isLiked: p.likes.some((l) => l.userId === req.user.id),
-//         tags: p.tags.map((t) => t.tag.name),
-//         comments: p.comments.map((c) => ({
-//           ...c,
-//           likeCount: c.commentLikes.length,
-//           isLiked: c.commentLikes.some(
-//             (l) => l.userId === req.user.id
-//           ),
-//           replies: c.replies.map((r) => ({
-//             ...r,
-//             likeCount: r.commentLikes.length,
-//             isLiked: r.commentLikes.some(
-//               (l) => l.userId === req.user.id
-//             ),
-//           })),
-//         })),
-//       })),
-//       pagination: {
-//         currentPage: page,
-//         totalPages: Math.ceil(totalPosts / limit),
-//         totalPosts,
-//       },
-//     });
-//   } catch (err) {
-//     console.error("GET POSTS ERROR:", err);
-//     res.status(500).json({ error: "Failed to fetch posts" });
-//   }
-// };
-
-// /* ================= CREATE POST ================= */
-// export const createPost = async (req, res) => {
-//   const { title, content, tags } = req.body;
-
-//   if (!title || !content) {
-//     return res.status(400).json({ error: "Title and content required" });
-//   }
-
-//   try {
-//     const tagRecords = tags?.length
-//       ? await Promise.all(
-//           tags.map((tag) =>
-//             prisma.tag.upsert({
-//               where: { name: tag.toLowerCase() },
-//               update: {},
-//               create: { name: tag.toLowerCase() },
-//             })
-//           )
-//         )
-//       : [];
-
-//     const post = await prisma.post.create({
-//       data: {
-//         title,
-//         content,
-//         authorId: req.user.id,
-//         status: "PENDING", // 🔥 moderation
-//         tags: { create: tagRecords.map((t) => ({ tagId: t.id })) },
-//       },
-//     });
-
-//     await logActivity({
-//       type: ActivityType.POST_CREATED,
-//       message: `submitted post "${post.title}" for approval`,
-//       userId: req.user.id,
-//       entity: "POST",
-//       entityId: post.id,
-//     });
-
-//     res.status(201).json({
-//       message: "Post submitted for admin approval",
-//       post,
-//     });
-//   } catch (err) {
-//     console.error("CREATE POST ERROR:", err);
-//     res.status(500).json({ error: "Failed to create post" });
-//   }
-// };
-
-// /* ================= LIKE POST ================= */
-// export const likePost = async (req, res) => {
-//   const postId = parseInt(req.params.id);
-//   const userId = req.user.id;
-
-//   try {
-//     const post = await prisma.post.findUnique({ where: { id: postId } });
-//     if (!post) return res.status(404).json({ error: "Post not found" });
-
-//     const existing = await prisma.like.findFirst({
-//       where: { postId, userId },
-//     });
-
-//     if (existing) {
-//       await prisma.like.delete({ where: { id: existing.id } });
-//       return res.json({ liked: false });
-//     }
-
-//     await prisma.like.create({ data: { postId, userId } });
-
-//     await logActivity({
-//       type: ActivityType.POST_LIKED,
-//       message: `liked post "${post.title}"`,
-//       userId,
-//       entity: "POST",
-//       entityId: post.id,
-//     });
-
-//     res.json({ liked: true });
-//   } catch (err) {
-//     console.error("LIKE POST ERROR:", err);
-//     res.status(500).json({ error: "Failed to like post" });
-//   }
-// };
-
-// /* ================= CREATE COMMENT ================= */
-// export const createComment = async (req, res) => {
-//   const { postId, content, parentCommentId } = req.body;
-
-//   if (!content) {
-//     return res.status(400).json({ error: "Comment content required" });
-//   }
-
-//   try {
-//     const post = await prisma.post.findUnique({
-//       where: { id: parseInt(postId) },
-//     });
-//     if (!post) return res.status(404).json({ error: "Post not found" });
-
-//     const comment = await prisma.comment.create({
-//       data: {
-//         content,
-//         postId: post.id,
-//         parentCommentId: parentCommentId || null,
-//         authorId: req.user.id,
-//       },
-//       include: { author: true },
-//     });
-
-//     await logActivity({
-//       type: ActivityType.COMMENT_CREATED,
-//       message: `commented on post "${post.title}"`,
-//       userId: req.user.id,
-//       entity: "POST",
-//       entityId: post.id,
-//     });
-
-//     res.status(201).json({ comment });
-//   } catch (err) {
-//     console.error("CREATE COMMENT ERROR:", err);
-//     res.status(500).json({ error: "Failed to add comment" });
-//   }
-// };
-
-// /* ================= GET COMMENTS ================= */
-// export const getComments = async (req, res) => {
-//   const postId = parseInt(req.params.postId);
-
-//   try {
-//     const comments = await prisma.comment.findMany({
-//       where: { postId, parentCommentId: null },
-//       include: {
-//         author: true,
-//         commentLikes: true,
-//         replies: { include: { author: true, commentLikes: true } },
-//       },
-//       orderBy: { createdAt: "asc" },
-//     });
-
-//     res.json({
-//       comments: comments.map((c) => ({
-//         ...c,
-//         likeCount: c.commentLikes.length,
-//         isLiked: c.commentLikes.some(
-//           (l) => l.userId === req.user.id
-//         ),
-//         replies: c.replies.map((r) => ({
-//           ...r,
-//           likeCount: r.commentLikes.length,
-//           isLiked: r.commentLikes.some(
-//             (l) => l.userId === req.user.id
-//           ),
-//         })),
-//       })),
-//     });
-//   } catch (err) {
-//     console.error("GET COMMENTS ERROR:", err);
-//     res.status(500).json({ error: "Failed to fetch comments" });
-//   }
-// };
-
-// /* ================= LIKE COMMENT ================= */
-// export const likeComment = async (req, res) => {
-//   const commentId = parseInt(req.params.commentId);
-//   const userId = req.user.id;
-
-//   try {
-//     const comment = await prisma.comment.findUnique({
-//       where: { id: commentId },
-//       include: { post: true },
-//     });
-//     if (!comment) return res.status(404).json({ error: "Comment not found" });
-
-//     const existing = await prisma.commentLike.findFirst({
-//       where: { commentId, userId },
-//     });
-
-//     if (existing) {
-//       await prisma.commentLike.delete({ where: { id: existing.id } });
-//       return res.json({ liked: false });
-//     }
-
-//     await prisma.commentLike.create({ data: { commentId, userId } });
-
-//     await logActivity({
-//       type: ActivityType.COMMENT_LIKED,
-//       message: `liked a comment`,
-//       userId,
-//       entity: "COMMENT",
-//       entityId: comment.id,
-//     });
-
-//     res.json({ liked: true });
-//   } catch (err) {
-//     console.error("LIKE COMMENT ERROR:", err);
-//     res.status(500).json({ error: "Failed to like comment" });
-//   }
-// };
-
-// /* ================= DELETE COMMENT ================= */
-// export const deleteComment = async (req, res) => {
-//   const commentId = parseInt(req.params.commentId);
-
-//   try {
-//     const comment = await prisma.comment.findUnique({
-//       where: { id: commentId },
-//     });
-
-//     if (!comment)
-//       return res.status(404).json({ error: "Comment not found" });
-
-//     if (
-//       comment.authorId !== req.user.id &&
-//       req.user.role !== "ADMIN"
-//     ) {
-//       return res.status(403).json({ error: "Not authorized" });
-//     }
-
-//     await prisma.comment.delete({ where: { id: commentId } });
-
-//     res.json({ message: "Comment deleted successfully" });
-//   } catch (err) {
-//     console.error("DELETE COMMENT ERROR:", err);
-//     res.status(500).json({ error: "Failed to delete comment" });
-//   }
-// };
-
-// /* ================= DELETE POST ================= */
-// export const deletePost = async (req, res) => {
-//   const postId = parseInt(req.params.id);
-
-//   try {
-//     const post = await prisma.post.findUnique({
-//       where: { id: postId },
-//     });
-
-//     if (!post)
-//       return res.status(404).json({ error: "Post not found" });
-
-//     if (
-//       post.authorId !== req.user.id &&
-//       req.user.role !== "ADMIN"
-//     ) {
-//       return res.status(403).json({ error: "Not authorized" });
-//     }
-
-//     await prisma.post.delete({ where: { id: postId } });
-
-//     res.json({ message: "Post deleted successfully" });
-//   } catch (err) {
-//     console.error("DELETE POST ERROR:", err);
-//     res.status(500).json({ error: "Failed to delete post" });
-//   }
-// };
-
-
-
-
-import { PrismaClient, ActivityType } from "@prisma/client";
-import { logActivity } from "../services/activityService.js";
-
-const prisma = new PrismaClient();
-
-/* ======================================================
-   GET POSTS (PUBLIC FEED — DEMO SAFE)
-   ====================================================== */
-export const getPosts = async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 10;
-  const skip = (page - 1) * limit;
-
-  // req.user may not exist (public feed)
-  const userId = req.user?.id || null;
-
-  try {
-    const posts = await prisma.post.findMany({
-      skip,
-      take: limit,
-      orderBy: { createdAt: "desc" },
-
-      // 🔴 IMPORTANT: DO NOT FILTER BY STATUS FOR NOW
-      // Visibility > moderation (demo phase)
-      where: {},
-
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            profileImage: true,
-            role: true,
-          },
-        },
-        likes: {
-          select: { userId: true },
-        },
-        comments: {
-          where: { parentCommentId: null },
-          select: { id: true },
-        },
-        tags: {
-          include: { tag: true },
-        },
-      },
-    });
-
-    const totalPosts = await prisma.post.count();
-
-    // console.log("POSTS FOUND:", posts.length);
-    if (page === 1) {
-  console.log("POSTS FOUND:", posts.length);
-}
-
-
-    res.json({
-      posts: posts.map((p) => ({
-        id: p.id,
-        title: p.title,
-        content: p.content,
-        createdAt: p.createdAt,
-        image: p.image,
-        author: p.author,
-        tags: p.tags.map((t) => t.tag.name),
-        likeCount: p.likes.length,
-        commentCount: p.comments.length,
-        isLiked: userId
-          ? p.likes.some((l) => l.userId === userId)
-          : false,
-      })),
-      pagination: {
-        currentPage: page,
-        totalPages: Math.ceil(totalPosts / limit),
-        totalPosts,
-      },
-    });
-  } catch (err) {
-    console.error("GET POSTS ERROR:", err);
-    res.status(500).json({ error: "Failed to fetch posts" });
-  }
-};
-
-/* ======================================================
-   GET POST BY ID
-   ====================================================== */
-export const getPostById = async (req, res) => {
-  const postId = parseInt(req.params.id);
-  const userId = req.user?.id || null;
-
-  try {
-    const post = await prisma.post.findUnique({
-      where: { id: postId },
-      include: {
-        author: {
-          select: {
-            id: true,
-            name: true,
-            profileImage: true,
-            role: true,
-          },
-        },
-        likes: {
-          select: { userId: true },
-        },
-        comments: {
-          where: { parentCommentId: null },
-          select: { id: true },
-        },
-        tags: {
-          include: { tag: true },
-        },
-      },
-    });
-
-    if (!post) {
-      return res.status(404).json({ message: "Post not found" });
+import BaseController from '../base/BaseController.js';
+import { ErrorFactory } from '../errors/index.js';
+import postService from '../services/post.service.js';
+import { logger } from '../config/index.js';
+import { Response } from '../utils/ResponseBuilder.js';
+import getPrisma from '../config/prisma.js';
+
+class PostController extends BaseController {
+  // Create post
+  static create = BaseController.asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+    const userRole = req.user.role;
+    const { title, content } = req.body;
+    
+    // Handle uploaded image
+    const imageUrl = req.file ? req.file.path : null; // Cloudinary URL from multer-storage-cloudinary
+    
+    // Simple validation
+    if (!title?.trim() || !content?.trim()) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Title and content are required' 
+      });
     }
+    
+    const postData = {
+      title: title.trim(),
+      content: content.trim(),
+      ...(imageUrl && { imageUrl }) // Only include imageUrl if it exists
+    };
+    
+    const post = await postService.createPost(postData, userId);
+    logger.info('Post created:', { action: 'create_post', postId: post.id, hasImage: !!imageUrl });
+    
+    return Response.created(res, post, 'Post created successfully');
+  });
 
-    res.json({
-      id: post.id,
-      title: post.title,
-      content: post.content,
-      createdAt: post.createdAt,
-      image: post.image,
-      author: post.author,
-      tags: post.tags.map((t) => t.tag.name),
-      likeCount: post.likes.length,
-      commentCount: post.comments.length,
-      isLiked: userId
-        ? post.likes.some((l) => l.userId === userId)
-        : false,
-    });
-  } catch (err) {
-    console.error("GET POST BY ID ERROR:", err);
-    res.status(500).json({ error: "Failed to fetch post" });
-  }
-};
-
-/* ======================================================
-   CREATE POST
-   ====================================================== */
-export const createPost = async (req, res) => {
-  const { title, content, tags } = req.body;
-
-  if (!title || !content) {
-    return res.status(400).json({ error: "Title and content required" });
-  }
-
-  try {
-    const tagRecords = tags?.length
-      ? await Promise.all(
-          tags.map((tag) =>
-            prisma.tag.upsert({
-              where: { name: tag.toLowerCase() },
-              update: {},
-              create: { name: tag.toLowerCase() },
-            })
-          )
-        )
-      : [];
-
-    const post = await prisma.post.create({
-      data: {
-        title,
-        content,
-        authorId: req.user.id,
-        status: "PENDING",
-        tags: {
-          create: tagRecords.map((t) => ({ tagId: t.id })),
-        },
-      },
-    });
-
-    await logActivity({
-      type: ActivityType.POST_CREATED,
-      message: `created a post "${post.title}"`,
-      userId: req.user.id,
-      entity: "POST",
-      entityId: post.id,
-    });
-
-    res.status(201).json({
-      message: "Post created",
-      post,
-    });
-  } catch (err) {
-    console.error("CREATE POST ERROR:", err);
-    res.status(500).json({ error: "Failed to create post" });
-  }
-};
-
-/* ======================================================
-   LIKE / UNLIKE POST
-   ====================================================== */
-export const likePost = async (req, res) => {
-  const postId = parseInt(req.params.id);
-  const userId = req.user.id;
-
-  try {
-    const post = await prisma.post.findUnique({
-      where: { id: postId },
-    });
-
-    if (!post) {
-      return res.status(404).json({ error: "Post not found" });
+  // Get single post with counts
+  static getById = BaseController.asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user?.id;
+    
+    // Simple ID validation
+    const postId = parseInt(id);
+    if (isNaN(postId) || postId <= 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Valid post ID is required' 
+      });
     }
+    
+    const post = await postService.getPostById(postId, userId);
+    logger.info('Post retrieved:', { action: 'get_post', postId: post.id });
+    
+    return Response.success(res, post, 'Post retrieved successfully');
+  });
 
-    const existing = await prisma.like.findFirst({
-      where: { postId, userId },
-    });
-
-    if (existing) {
-      await prisma.like.delete({ where: { id: existing.id } });
-      return res.json({ liked: false });
+  // Add comment to post
+  static addComment = BaseController.asyncHandler(async (req, res) => {
+    console.log('REQ USER:', req.user);
+    const { id } = req.params;
+    const { content } = req.body;
+    const userId = req.user.id;
+    
+    // Validate content exists
+    if (!content?.trim()) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Content is required' 
+      });
     }
-
-    await prisma.like.create({
-      data: { postId, userId },
-    });
-
-    await logActivity({
-      type: ActivityType.POST_LIKED,
-      message: `liked a post`,
-      userId,
-      entity: "POST",
-      entityId: post.id,
-    });
-
-    res.json({ liked: true });
-  } catch (err) {
-    console.error("LIKE POST ERROR:", err);
-    res.status(500).json({ error: "Failed to like post" });
-  }
-};
-
-/* ======================================================
-   CREATE COMMENT
-   ====================================================== */
-export const createComment = async (req, res) => {
-  const { postId, content, parentCommentId } = req.body;
-
-  if (!content) {
-    return res.status(400).json({ error: "Comment content required" });
-  }
-
-  try {
-    const post = await prisma.post.findUnique({
-      where: { id: parseInt(postId) },
-    });
-
-    if (!post) {
-      return res.status(404).json({ error: "Post not found" });
-    }
-
+    
+    // Create comment directly with Prisma
+    const prisma = getPrisma();
     const comment = await prisma.comment.create({
       data: {
-        content,
-        postId: post.id,
-        parentCommentId: parentCommentId || null,
-        authorId: req.user.id,
+        content: content.trim(),
+        postId: parseInt(id),
+        authorId: userId
       },
-      include: { author: true },
-    });
-
-    await logActivity({
-      type: ActivityType.COMMENT_CREATED,
-      message: `commented on a post`,
-      userId: req.user.id,
-      entity: "POST",
-      entityId: post.id,
-    });
-
-    res.status(201).json({ comment });
-  } catch (err) {
-    console.error("CREATE COMMENT ERROR:", err);
-    res.status(500).json({ error: "Failed to add comment" });
-  }
-};
-
-/* ======================================================
-   GET COMMENTS
-   ====================================================== */
-export const getComments = async (req, res) => {
-  const postId = parseInt(req.params.postId);
-  const userId = req.user?.id;
-
-  try {
-    const comments = await prisma.comment.findMany({
-      where: { postId, parentCommentId: null },
-      orderBy: { createdAt: "asc" },
       include: {
         author: {
           select: {
             id: true,
             name: true,
             role: true,
-            profileImage: true,
-          },
-        },
-        commentLikes: {
-          select: { userId: true },
-        },
-        replies: {
-          orderBy: { createdAt: "asc" },
-          include: {
-            author: {
-              select: {
-                id: true,
-                name: true,
-                role: true,
-                profileImage: true,
-              },
-            },
-            commentLikes: {
-              select: { userId: true },
-            },
-          },
-        },
+            profileImage: true
+          }
+        }
+      }
+    });
+    
+    logger.info('Comment added:', { action: 'add_comment', postId: parseInt(id), commentId: comment.id });
+    
+    return res.status(201).json({ 
+      success: true, 
+      data: { comment },
+      message: 'Comment added successfully' 
+    });
+  });
+
+  // Get comments for a post
+  static getComments = BaseController.asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    
+    // Get comments directly with Prisma
+    const prisma = getPrisma();
+    const comments = await prisma.comment.findMany({
+      where: { postId: parseInt(id) },
+      include: {
+        author: {
+          select: {
+            id: true,
+            name: true,
+            role: true,
+            profileImage: true
+          }
+        }
       },
+      orderBy: { createdAt: 'asc' }
     });
+    
+    logger.info('Comments retrieved:', { action: 'get_comments', postId: parseInt(id), count: comments.length });
+    
+    return res.json({ 
+      success: true, 
+      data: { comments },
+      message: 'Comments retrieved successfully' 
+    });
+  });
 
-    res.json({
-      comments: comments.map((c) => ({
-        id: c.id,
-        content: c.content,
-        createdAt: c.createdAt,
-        postId: c.postId,
-        author: c.author,
-        likeCount: c.commentLikes.length,
-        isLiked: userId
-          ? c.commentLikes.some((l) => l.userId === userId)
-          : false,
-        replies: c.replies.map((r) => ({
-          id: r.id,
-          content: r.content,
-          createdAt: r.createdAt,
-          postId: r.postId,
-          author: r.author,
-          likeCount: r.commentLikes.length,
-          isLiked: userId
-            ? r.commentLikes.some((l) => l.userId === userId)
-            : false,
-        })),
-      })),
+  // Search posts, users, or both
+  static search = BaseController.asyncHandler(async (req, res) => {
+    const { q, type = 'all' } = req.query;
+    
+    // Validate query
+    if (!q || q.trim().length < 2) {
+      return res.json({ 
+        success: true, 
+        data: { posts: [], users: [] } 
+      });
+    }
+    
+    const searchTerm = q.trim();
+    const prisma = getPrisma();
+    
+    let posts = [];
+    let users = [];
+    
+    // Search posts if requested
+    if (type === 'all' || type === 'posts') {
+      posts = await prisma.post.findMany({
+        where: {
+          OR: [
+            { title: { contains: searchTerm, mode: 'insensitive' } },
+            { content: { contains: searchTerm, mode: 'insensitive' } }
+          ],
+          deletedAt: null // Only show non-deleted posts
+        },
+        include: {
+          author: {
+            select: {
+              id: true,
+              name: true,
+              role: true,
+              profileImage: true
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 10
+      });
+    }
+    
+    // Search users if requested
+    if (type === 'all' || type === 'users') {
+      users = await prisma.user.findMany({
+        where: {
+          OR: [
+            { name: { contains: searchTerm, mode: 'insensitive' } },
+            { email: { contains: searchTerm, mode: 'insensitive' } }
+          ],
+          isActive: true // Only show active users
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          role: true,
+          profileImage: true
+        },
+        orderBy: { name: 'asc' },
+        take: 10
+      });
+    }
+    
+    logger.info('Search performed:', { 
+      action: 'search', 
+      query: searchTerm, 
+      type, 
+      postsCount: posts.length, 
+      usersCount: users.length 
     });
-  } catch (err) {
-    console.error("GET COMMENTS ERROR:", err);
-    res.status(500).json({ error: "Failed to fetch comments" });
+    
+    return res.json({ 
+      success: true, 
+      data: { posts, users } 
+    });
+  });
+
+  // Get paginated posts
+  static getPosts = BaseController.asyncHandler(async (req, res) => {
+    const { page, limit, skip, sortBy, sortOrder } = BaseController.getPaginationParams(req);
+    
+    const pagination = { page, limit, skip, sortBy, sortOrder };
+    
+    const result = await postService.getPosts(pagination);
+    logger.info('Posts retrieved:', { action: 'get_posts', count: result.data.length });
+    
+    return Response.paginated(res, result.data, {
+      page,
+      limit,
+      total: result.pagination?.total || 0,
+      totalPages: Math.ceil((result.pagination?.total || 0) / limit),
+      hasNext: page * limit < (result.pagination?.total || 0),
+      hasPrev: page > 1
+    });
+  });
+
+  // Search posts
+  static searchPosts = BaseController.asyncHandler(async (req, res) => {
+    const { q } = req.query;
+    const { page, limit, skip, sortBy, sortOrder } = BaseController.getPaginationParams(req);
+    
+    const pagination = { page, limit, skip, sortBy, sortOrder };
+    
+    if (!q) {
+      return Response.badRequest(res, 'Search query is required');
+    }
+    
+    const result = await postService.searchPosts(q, pagination);
+    logger.info('Posts searched:', { action: 'search_posts', query: q, count: result.data.length });
+    
+    return Response.paginated(res, result.data, {
+      page,
+      limit,
+      total: result.total,
+      totalPages: Math.ceil(result.total / limit),
+      hasNext: page * limit < result.total,
+      hasPrev: page > 1
+    });
+  });
+
+  // Update post (only author or admin)
+  static updatePost = BaseController.asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const userRole = req.user.role;
+    
+    // Validate inputs
+    ValidationMiddleware.schemas.id.validate({ id: parseInt(id) });
+    ValidationMiddleware.schemas.postUpdate.validate(req.body);
+    
+    const post = await postService.updatePost(parseInt(id), req.body, userId, userRole);
+    logger.info('Post updated:', { action: 'update_post', postId: post.id });
+    
+    return Response.updated(res, post, 'Post updated successfully');
+  });
+
+  // Delete post (only author or admin)
+  static deletePost = BaseController.asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const userId = req.user.id;
+    const userRole = req.user.role;
+    
+    // Validate ID
+    ValidationMiddleware.schemas.id.validate({ id: parseInt(id) });
+    
+    await postService.deletePost(parseInt(id), userId, userRole);
+    logger.info('Post deleted:', { action: 'delete_post', postId: parseInt(id) });
+    
+    return Response.deleted(res, 'Post deleted successfully');
+  });
+
+  // Get posts by author
+  static getPostsByAuthor = BaseController.asyncHandler(async (req, res) => {
+    const { authorId } = req.params;
+    const { page, limit, skip, sortBy, sortOrder } = BaseController.getPaginationParams(req);
+    
+    const pagination = { page, limit, skip, sortBy, sortOrder };
+    
+    // Validate author ID
+    ValidationMiddleware.schemas.id.validate({ id: parseInt(authorId) });
+    
+    const result = await postService.getPostsByAuthor(parseInt(authorId), pagination);
+    logger.info('Posts by author retrieved:', { action: 'get_posts_by_author', authorId: parseInt(authorId), count: result.data.length });
+    
+    return Response.paginated(res, result.data, {
+      page,
+      limit,
+      total: result.total,
+      totalPages: Math.ceil(result.total / limit),
+      hasNext: page * limit < result.total,
+      hasPrev: page > 1
+    });
+  });
+
+  // Get posts with cursor pagination (infinite scroll)
+  static getPostsWithCursor = BaseController.asyncHandler(async (req, res) => {
+    const { cursor } = req.query;
+    const { limit = 20 } = req.query;
+    
+    const result = await postService.getPostsWithCursor({ 
+      cursor: cursor ? parseInt(cursor) : null, 
+      limit: parseInt(limit) 
+    });
+    
+    logger.info('Posts with cursor retrieved:', { action: 'get_posts_cursor', cursor, count: result.data.length });
+    
+    return Response.success(res, {
+      data: result.data,
+      pagination: result.pagination,
+      nextCursor: result.pagination.nextCursor
+    });
+  });
+
+  // Like/unlike post
+  static likePost = async (req, res) => {
+    try {
+      const postId = parseInt(req.params.id)
+      const userId = req.user.id
+
+      // Validate ID
+      ValidationMiddleware.schemas.id.validate({ id: postId });
+      
+      // Check if post exists
+      const post = await getPrisma().post.findUnique({
+        where: { id: postId },
+        select: { id: true, authorId: true }
+      });
+
+      if (!post) {
+        return Response.notFound(res, 'Post');
+      }
+
+      // Check if already liked
+      const existing = await getPrisma().$queryRawUnsafe(
+        `SELECT id FROM likes 
+           WHERE "postId" = $1 AND "userId" = $2`,
+        postId, userId
+      );
+
+      if (existing.length > 0) {
+        // Unlike
+        await getPrisma().$executeRawUnsafe(
+          `DELETE FROM likes 
+             WHERE "postId" = $1 AND "userId" = $2`,
+          postId, userId
+        );
+        
+        logger.info('Post unliked:', { action: 'unlike_post', postId, userId });
+        
+        return res.json({ 
+          success: true, 
+          message: 'Post unliked',
+          liked: false 
+        });
+      } else {
+        // Like
+        await getPrisma().$executeRawUnsafe(
+          `INSERT INTO likes ("postId", "userId", "createdAt") 
+             VALUES ($1, $2, NOW())`,
+          postId, userId
+        );
+        
+        logger.info('Post liked:', { action: 'like_post', postId, userId });
+        
+        return res.json({ 
+          success: true, 
+          message: 'Post liked',
+          liked: true 
+        });
+      }
+    } catch (error) {
+      console.error('Like error:', error);
+      return res.status(500).json({ 
+        success: false, 
+        message: error.message 
+      });
+    }
   }
-};
+}
 
-/* ======================================================
-   LIKE COMMENT
-   ====================================================== */
-export const likeComment = async (req, res) => {
-  const commentId = parseInt(req.params.commentId);
-  const userId = req.user.id;
-
-  try {
-    const existing = await prisma.commentLike.findFirst({
-      where: { commentId, userId },
-    });
-
-    if (existing) {
-      await prisma.commentLike.delete({ where: { id: existing.id } });
-      return res.json({ liked: false });
-    }
-
-    await prisma.commentLike.create({
-      data: { commentId, userId },
-    });
-
-    res.json({ liked: true });
-  } catch (err) {
-    console.error("LIKE COMMENT ERROR:", err);
-    res.status(500).json({ error: "Failed to like comment" });
-  }
-};
-
-/* ======================================================
-   DELETE COMMENT
-   ====================================================== */
-export const deleteComment = async (req, res) => {
-  const commentId = parseInt(req.params.commentId);
-
-  try {
-    const comment = await prisma.comment.findUnique({
-      where: { id: commentId },
-    });
-
-    if (!comment) {
-      return res.status(404).json({ error: "Comment not found" });
-    }
-
-    if (comment.authorId !== req.user.id && req.user.role !== "ADMIN") {
-      return res.status(403).json({ error: "Not authorized" });
-    }
-
-    await prisma.comment.delete({ where: { id: commentId } });
-    res.json({ message: "Comment deleted successfully" });
-  } catch (err) {
-    console.error("DELETE COMMENT ERROR:", err);
-    res.status(500).json({ error: "Failed to delete comment" });
-  }
-};
-
-/* ======================================================
-   DELETE POST
-   ====================================================== */
-export const deletePost = async (req, res) => {
-  const postId = parseInt(req.params.id);
-
-  try {
-    const post = await prisma.post.findUnique({
-      where: { id: postId },
-    });
-
-    if (!post) {
-      return res.status(404).json({ error: "Post not found" });
-    }
-
-    if (post.authorId !== req.user.id && req.user.role !== "ADMIN") {
-      return res.status(403).json({ error: "Not authorized" });
-    }
-
-    await prisma.post.delete({ where: { id: postId } });
-    res.json({ message: "Post deleted successfully" });
-  } catch (err) {
-    console.error("DELETE POST ERROR:", err);
-    res.status(500).json({ error: "Failed to delete post" });
-  }
-};
+export default PostController;

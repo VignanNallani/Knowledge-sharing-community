@@ -183,12 +183,8 @@
 
 
 
-
-
-
-
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { FiHeart } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
@@ -266,9 +262,7 @@ export default function CommentItem({ comment, depth = 0 }) {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
+    <div
       className={`rounded-xl border p-4 transition ${
         comment.optimistic
           ? "bg-gray-50 border-dashed opacity-70"
@@ -329,14 +323,8 @@ export default function CommentItem({ comment, depth = 0 }) {
       )}
 
       {/* Reply Box */}
-      <AnimatePresence>
         {showReply && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mt-3 pl-3 border-l space-y-2"
-          >
+          <div className="mt-3 pl-3 border-l space-y-2">
             <textarea
               value={reply}
               onChange={(e) => setReply(e.target.value)}
@@ -351,9 +339,8 @@ export default function CommentItem({ comment, depth = 0 }) {
             >
               {replyLoading ? "Replying..." : "Reply"}
             </button>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
-    </motion.div>
+    </div>
   );
 }

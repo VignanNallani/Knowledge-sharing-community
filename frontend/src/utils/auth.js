@@ -1,103 +1,45 @@
-
-
-// /**
-//  * Get logged-in user object
-//  */
-// export const getUser = () => {
-//   try {
-//     const user = localStorage.getItem("user");
-//     return user ? JSON.parse(user) : null;
-//   } catch (err) {
-//     console.error("Failed to parse user from localStorage", err);
-//     return null;
-//   }
-// };
-
-// /**
-//  * Get JWT token
-//  */
-// export const getToken = () => {
-//   return localStorage.getItem("token");
-// };
-
-// /**
-//  * Check authentication status
-//  */
-// export const isAuthenticated = () => {
-//   return Boolean(getToken());
-// };
-
-// /**
-//  * Save auth data after login
-//  * (Call this after successful login API response)
-//  */
-// export const setAuth = ({ token, user }) => {
-//   if (!token || !user) return;
-
-//   localStorage.setItem("token", token);
-//   localStorage.setItem("user", JSON.stringify(user));
-// };
-
-// /**
-//  * Logout user safely
-//  */
-// export const logout = () => {
-//   localStorage.removeItem("token");
-//   localStorage.removeItem("user");
-
-//   // Optional: clear any cached app state later
-//   // localStorage.removeItem("theme");
-//   // localStorage.removeItem("draftPost");
-
-//   window.location.replace("/signin");
-// };
-
-
-
-/**
- * Get logged-in user object
- */
-export const getUser = () => {
+// Token management utilities
+export const getAuthToken = () => {
   try {
-    const user = localStorage.getItem("user");
-    return user ? JSON.parse(user) : null;
-  } catch (err) {
-    console.error("Failed to parse user from localStorage", err);
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      // Fallback to sessionStorage for security
+      return sessionStorage.getItem('accessToken');
+    }
+    return token;
+  } catch (error) {
+    console.error('Error getting auth token:', error);
     return null;
   }
 };
 
-/**
- * Get JWT token
- */
-export const getToken = () => {
-  return localStorage.getItem("token");
+export const setAuthToken = (token) => {
+  try {
+    localStorage.setItem('accessToken', token);
+    sessionStorage.setItem('accessToken', token);
+  } catch (error) {
+    console.error('Error setting auth token:', error);
+  }
 };
 
-/**
- * Check authentication status
- */
-export const isAuthenticated = () => {
-  return Boolean(getToken());
+export const removeAuthToken = () => {
+  try {
+    localStorage.removeItem('accessToken');
+    sessionStorage.removeItem('accessToken');
+  } catch (error) {
+    console.error('Error removing auth token:', error);
+  }
 };
 
-/**
- * Save auth data after login
- */
-export const setAuth = ({ token, user }) => {
-  if (!token || !user) return;
-
-  localStorage.setItem("token", token);
-  localStorage.setItem("user", JSON.stringify(user));
-};
-
-/**
- * Logout user (SAFE + SPA FRIENDLY)
- */
-export const logout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("user");
-
-  // 🔥 notify app to re-render auth state
-  window.dispatchEvent(new Event("auth-changed"));
+export const isTokenExpired = (token) => {
+  if (!token) return true;
+  
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const currentTime = Date.now() / 1000;
+    return payload.exp < currentTime;
+  } catch (error) {
+    console.error('Error checking token expiration:', error);
+    return true;
+  }
 };

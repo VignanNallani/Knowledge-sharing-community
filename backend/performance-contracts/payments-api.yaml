@@ -1,0 +1,81 @@
+# Performance Contract Specification
+# Organization-wide performance governance
+
+service: payments-api
+version: 1.2.0
+owner: payments-team
+last_updated: 2026-03-02T16:30:00Z
+
+# === PERFORMANCE BUDGETS ===
+# These are version-controlled contracts, not suggestions
+latency_budget:
+  p50: 40ms      # 50th percentile latency budget
+  p95: 120ms     # 95th percentile latency budget
+  p99: 250ms     # 99th percentile (for monitoring only)
+  
+error_budget:
+  max_rate: 0.1% # Maximum error rate (1 per 1000 requests)
+  
+resource_budgets:
+  db_query_time: 250ms     # Maximum database query time
+  middleware_overhead: 10ms # Maximum middleware processing time
+  connection_wait: 50ms     # Maximum connection pool wait time
+  
+# === DEPENDENCY BUDGETS ===
+# Budgets for upstream services this service depends on
+upstream_dependencies:
+  user-service:
+    latency_budget: 30ms
+    error_budget: 0.05%
+  fraud-detection:
+    latency_budget: 100ms
+    error_budget: 0.2%
+
+# === DOWNSTREAM IMPACT ===
+# How this service affects downstream services
+downstream_impact:
+  max_latency_addition: 20ms  # Maximum latency this service can add to downstream
+  availability_requirement: 99.9%
+
+# === ENFORCEMENT RULES ===
+ci_enforcement:
+  regression_threshold: 3-sigma  # Statistical regression detection
+  min_sample_size: 1000        # Minimum requests for CI test
+  warmup_duration: 30s         # Warmup period before measurement
+  
+production_enforcement:
+  alert_threshold: 2x_budget   # Alert at 2x budget
+  auto_healing_enabled: true    # Enable auto-healing for budget violations
+  escalation_threshold: 3       # Escalate after 3 violations in 24h
+
+# === WAIVERS AND EXCEPTIONS ===
+temporary_waivers:
+  - id: "holiday-season-2026"
+    reason: "Expected holiday traffic spike"
+    budget_increase: 50%
+    start_date: "2026-12-15"
+    end_date: "2026-12-31"
+    approved_by: "cto@company.com"
+    
+  - id: "migration-2026-q1"
+    reason: "Database migration overhead"
+    db_query_time: 500ms
+    start_date: "2026-02-01"
+    end_date: "2026-03-31"
+    approved_by: "engineering-leads@company.com"
+
+# === COMPLIANCE HISTORY ===
+compliance_history:
+  - date: "2026-01-15"
+    type: "violation"
+    metric: "p95_latency"
+    actual: 145ms
+    budget: 120ms
+    action: "auto-scaling triggered"
+    resolved: "2026-01-15T14:30:00Z"
+    
+  - date: "2026-02-01"
+    type: "contract_update"
+    change: "Increased p95 budget from 100ms to 120ms"
+    reason: "New fraud detection integration"
+    approved_by: "performance-review@company.com"

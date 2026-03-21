@@ -1,241 +1,225 @@
+import BaseController from '../base/BaseController.js';
+import { ErrorFactory } from '../errors/index.js';
+import followService from '../services/follow.service.js';
+import ValidationMiddleware from '../middleware/validation.middleware.js';
+import { logger } from '../config/index.js';
+import { Response } from '../utils/ResponseBuilder.js';
 
-
-
-// import { PrismaClient } from "@prisma/client";
-// import { logActivity } from "../services/activityService.js";
-
-// const prisma = new PrismaClient();
-
-// /* ================= FOLLOW USER ================= */
-// export const followUser = async (req, res) => {
-//   const followerId = req.user.id;
-//   const followingId = Number(req.params.userId);
-
-//   if (followerId === followingId) {
-//     return res.status(400).json({ error: "You cannot follow yourself" });
-//   }
-
-//   try {
-//     const userToFollow = await prisma.user.findUnique({
-//       where: { id: followingId },
-//     });
-
-//     if (!userToFollow) {
-//       return res.status(404).json({ error: "User not found" });
-//     }
-
-//     await prisma.follower.create({
-//       data: { followerId, followingId },
-//     });
-
-//     await logActivity({
-//       type: "USER_FOLLOWED",
-//       message: `started following ${userToFollow.name}`,
-//       userId: followerId,
-//       entity: "USER",
-//       entityId: followingId,
-//     });
-
-//     res.json({ message: "User followed successfully" });
-//   } catch (err) {
-//     if (err.code === "P2002") {
-//       return res.status(400).json({ error: "Already following this user" });
-//     }
-
-//     console.error("FOLLOW USER ERROR:", err);
-//     res.status(500).json({ error: "Failed to follow user" });
-//   }
-// };
-
-// /* ================= UNFOLLOW USER ================= */
-// export const unfollowUser = async (req, res) => {
-//   const followerId = req.user.id;
-//   const followingId = Number(req.params.userId);
-
-//   try {
-//     await prisma.follower.delete({
-//       where: {
-//         followerId_followingId: { followerId, followingId },
-//       },
-//     });
-
-//    await logActivity({
-//   type: "USER_FOLLOWED",
-//   message: `started following ${userToFollow.name}`,
-//   userId: followerId,
-// });
-
-
-//     res.json({ message: "User unfollowed successfully" });
-//   } catch (err) {
-//     console.error("UNFOLLOW USER ERROR:", err);
-//     res.status(400).json({ error: "You are not following this user" });
-//   }
-// };
-
-// /* ================= GET FOLLOWERS ================= */
-// export const getFollowers = async (req, res) => {
-//   const userId = Number(req.params.userId);
-
-//   const followers = await prisma.follower.findMany({
-//     where: { followingId: userId },
-//     include: { follower: true },
-//   });
-
-//   res.json({ count: followers.length, followers });
-// };
-
-// /* ================= GET FOLLOWING ================= */
-// export const getFollowing = async (req, res) => {
-//   const userId = Number(req.params.userId);
-
-//   const following = await prisma.follower.findMany({
-//     where: { followerId: userId },
-//     include: { following: true },
-//   });
-
-//   res.json({ count: following.length, following });
-// };
-
-// /* ================= IS FOLLOWING ================= */
-// export const isFollowing = async (req, res) => {
-//   const followerId = req.user.id;
-//   const followingId = Number(req.params.userId);
-
-//   const follow = await prisma.follower.findUnique({
-//     where: {
-//       followerId_followingId: { followerId, followingId },
-//     },
-//   });
-
-//   res.json({ isFollowing: !!follow });
-// };
-
-
-
-
-import { PrismaClient, ActivityType } from "@prisma/client";
-import { logActivity } from "../services/activityService.js";
-
-const prisma = new PrismaClient();
-
-/* ================= FOLLOW USER ================= */
-export const followUser = async (req, res) => {
-  const followerId = req.user.id;
-  const followingId = Number(req.params.userId);
-
-  if (followerId === followingId) {
-    return res.status(400).json({ error: "You cannot follow yourself" });
-  }
-
-  try {
-    const userToFollow = await prisma.user.findUnique({
-      where: { id: followingId },
-      select: { id: true, name: true },
-    });
-
-    if (!userToFollow) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    // Create follow relationship
-    await prisma.follower.create({
-      data: { followerId, followingId },
-    });
-
-    // Log activity safely
-    try {
-      await logActivity({
-        type: ActivityType.USER_FOLLOWED,
-        message: `started following ${userToFollow.name}`,
-        userId: followerId,
-        entity: "USER",
-        entityId: followingId,
+class FollowController extends BaseController {
+  // Follow/unfollow user (toggle)
+  static followUser = BaseController.asyncHandler(async (req, res) => {
+    const followerId = req.user.id;
+    const { targetUserId } = req.params;
+    
+    // Validate inputs
+    ValidationMiddleware.schemas.id.validate({ id: parseInt(targetUserId) });
+    
+    // Check if already following
+    const isFollowing = await followService.isFollowing(followerId, parseInt(targetUserId));
+    
+    if (isFollowing) {
+      // Unfollow if already following
+      const result = await followService.unfollowUser(followerId, parseInt(targetUserId));
+      logger.info('User unfollowed:', { 
+        action: 'unfollow_user', 
+        followingId: parseInt(targetUserId), 
+        followerId
       });
-    } catch (err) {
-      console.warn("Activity logging failed (follow):", err.message);
-    }
-
-    return res.status(200).json({ message: "User followed successfully" });
-  } catch (err) {
-    if (err.code === "P2002") {
-      return res.status(400).json({ error: "Already following this user" });
-    }
-
-    console.error("FOLLOW USER ERROR:", err);
-    return res.status(500).json({ error: "Failed to follow user" });
-  }
-};
-
-/* ================= UNFOLLOW USER ================= */
-export const unfollowUser = async (req, res) => {
-  const followerId = req.user.id;
-  const followingId = Number(req.params.userId);
-
-  try {
-    const existingFollow = await prisma.follower.findUnique({
-      where: { followerId_followingId: { followerId, followingId } },
-      include: { following: { select: { name: true } } },
-    });
-
-    if (!existingFollow) {
-      return res.status(400).json({ error: "You are not following this user" });
-    }
-
-    await prisma.follower.delete({
-      where: { followerId_followingId: { followerId, followingId } },
-    });
-
-    // Log activity safely
-    try {
-      await logActivity({
-        type: ActivityType.USER_UNFOLLOWED,
-        message: `stopped following ${existingFollow.following.name}`,
-        userId: followerId,
-        entity: "USER",
-        entityId: followingId,
+      
+      return Response.success(res, { following: false }, 'User unfollowed successfully');
+    } else {
+      // Follow if not already following
+      const follow = await followService.followUser(followerId, parseInt(targetUserId));
+      logger.info('User followed:', { 
+        action: 'follow_user', 
+        followingId: parseInt(targetUserId), 
+        followerId
       });
-    } catch (err) {
-      console.warn("Activity logging failed (unfollow):", err.message);
+      
+      return Response.success(res, { following: true, follow }, 'User followed successfully');
     }
-
-    return res.status(200).json({ message: "User unfollowed successfully" });
-  } catch (err) {
-    console.error("UNFOLLOW USER ERROR:", err);
-    return res.status(500).json({ error: "Failed to unfollow user" });
-  }
-};
-
-/* ================= GET FOLLOWERS ================= */
-export const getFollowers = async (req, res) => {
-  const userId = Number(req.params.userId);
-  const followers = await prisma.follower.findMany({
-    where: { followingId: userId },
-    include: { follower: true },
   });
 
-  return res.json({ count: followers.length, followers });
-};
-
-/* ================= GET FOLLOWING ================= */
-export const getFollowing = async (req, res) => {
-  const userId = Number(req.params.userId);
-  const following = await prisma.follower.findMany({
-    where: { followerId: userId },
-    include: { following: true },
+  // Unfollow user
+  static unfollowUser = BaseController.asyncHandler(async (req, res) => {
+    const followerId = req.user.id;
+    const { targetUserId } = req.params;
+    
+    // Validate inputs
+    ValidationMiddleware.schemas.id.validate({ id: parseInt(targetUserId) });
+    
+    const result = await followService.unfollowUser(followerId, parseInt(targetUserId));
+    logger.info('User unfollowed:', { 
+      action: 'unfollow_user', 
+      followingId: parseInt(targetUserId), 
+      unfollowed: result.unfollowed 
+    });
+    
+    return Response.success(res, result, 'User unfollowed successfully');
   });
 
-  return res.json({ count: following.length, following });
-};
-
-/* ================= IS FOLLOWING ================= */
-export const isFollowing = async (req, res) => {
-  const followerId = req.user.id;
-  const followingId = Number(req.params.userId);
-
-  const follow = await prisma.follower.findUnique({
-    where: { followerId_followingId: { followerId, followingId } },
+  // Get followers of user
+  static getFollowers = BaseController.asyncHandler(async (req, res) => {
+    const { userId } = req.params;
+    const pagination = this.getPaginationParams(req);
+    
+    // Validate inputs
+    ValidationMiddleware.schemas.id.validate({ id: parseInt(userId) });
+    
+    const result = await followService.getFollowers(parseInt(userId), pagination);
+    logger.info('Followers retrieved:', { 
+      action: 'get_followers', 
+      userId: parseInt(userId), 
+      count: result.data.length 
+    });
+    
+    return Response.paginated(res, result.data, result.pagination);
   });
 
-  return res.json({ isFollowing: Boolean(follow) });
-};
+  // Get following of user
+  static getFollowing = BaseController.asyncHandler(async (req, res) => {
+    const { userId } = req.params;
+    const pagination = this.getPaginationParams(req);
+    
+    // Validate inputs
+    ValidationMiddleware.schemas.id.validate({ id: parseInt(userId) });
+    
+    const result = await followService.getFollowing(parseInt(userId), pagination);
+    logger.info('Following retrieved:', { 
+      action: 'get_following', 
+      userId: parseInt(userId), 
+      count: result.data.length 
+    });
+    
+    return Response.paginated(res, result.data, result.pagination);
+  });
+
+  // Get follower count
+  static getFollowersCount = BaseController.asyncHandler(async (req, res) => {
+    const { userId } = req.params;
+    
+    // Validate inputs
+    ValidationMiddleware.schemas.id.validate({ id: parseInt(userId) });
+    
+    const count = await followService.getFollowersCount(parseInt(userId));
+    logger.info('Followers count retrieved:', { 
+      action: 'get_followers_count', 
+      userId: parseInt(userId) 
+    });
+    
+    return Response.success(res, { count }, 'Followers count retrieved successfully');
+  });
+
+  // Get following count
+  static getFollowingCount = BaseController.asyncHandler(async (req, res) => {
+    const { userId } = req.params;
+    
+    // Validate inputs
+    ValidationMiddleware.schemas.id.validate({ id: parseInt(userId) });
+    
+    const count = await followService.getFollowingCount(parseInt(userId));
+    logger.info('Following count retrieved:', { 
+      action: 'get_following_count', 
+      userId: parseInt(userId) 
+    });
+    
+    return Response.success(res, { count }, 'Following count retrieved successfully');
+  });
+
+  // Check if following user
+  static isFollowing = BaseController.asyncHandler(async (req, res) => {
+    const followerId = this.getUserId(req);
+    const { followingId } = req.params;
+    
+    // Validate inputs
+    ValidationMiddleware.schemas.id.validate({ id: parseInt(followingId) });
+    
+    const isFollowing = await followService.isFollowing(followerId, parseInt(followingId));
+    logger.info('Follow status checked:', { 
+      action: 'is_following', 
+      followerId: parseInt(followerId), 
+      followingId: parseInt(followingId), 
+      isFollowing 
+    });
+    
+    return Response.success(res, { isFollowing }, 'Follow status retrieved successfully');
+  });
+
+  // Get follow relationship between two users
+  static getFollowRelationship = BaseController.asyncHandler(async (req, res) => {
+    const { userId1, userId2 } = req.params;
+    
+    // Validate inputs
+    ValidationMiddleware.schemas.id.validate({ id: parseInt(userId1) });
+    ValidationMiddleware.schemas.id.validate({ id: parseInt(userId2) });
+    
+    const relationship = await followService.getFollowRelationship(parseInt(userId1), parseInt(userId2));
+    this.logRequest(req, { action: 'get_follow_relationship', userId1: parseInt(userId1), userId2: parseInt(userId2) });
+    
+    return this.success(res, relationship, 'Follow relationship retrieved successfully');
+  });
+
+  // Get user social stats
+  static getUserSocialStats = BaseController.asyncHandler(async (req, res) => {
+    const { userId } = req.params;
+    
+    // Validate inputs
+    ValidationMiddleware.schemas.id.validate({ id: parseInt(userId) });
+    
+    const stats = await followService.getUserSocialStats(parseInt(userId));
+    logger.info('User social stats retrieved:', { 
+      action: 'get_user_social_stats', 
+      userId: parseInt(userId), 
+      totalLikes: stats.totalLikes 
+    });
+    
+    return Response.success(res, stats, 'User social stats retrieved successfully');
+  });
+
+  // Batch follow status check
+  static getFollowStatus = BaseController.asyncHandler(async (req, res) => {
+    const userId = this.getUserId(req);
+    const { userIds } = req.body;
+    
+    // Validate inputs
+    if (!Array.isArray(userIds) || userIds.length === 0) {
+      return this.badRequest(res, 'User IDs array is required');
+    }
+    
+    if (userIds.length > 50) {
+      return this.badRequest(res, 'Cannot check more than 50 users at once');
+    }
+    
+    const validUserIds = userIds.map(id => parseInt(id)).filter(id => !isNaN(id));
+    
+    const statusMap = await followService.getFollowStatus(userId, validUserIds);
+    logger.info('Follow status retrieved:', { 
+      action: 'get_follow_status', 
+      checkedUsers: validUserIds.length 
+    });
+    
+    return Response.success(res, statusMap, 'Follow status retrieved successfully');
+  });
+
+  // Get mutual followers
+  static getMutualFollowers = BaseController.asyncHandler(async (req, res) => {
+    const { userId1, userId2 } = req.params;
+    const pagination = this.getPaginationParams(req);
+    
+    // Validate inputs
+    ValidationMiddleware.schemas.id.validate({ id: parseInt(userId1) });
+    ValidationMiddleware.schemas.id.validate({ id: parseInt(userId2) });
+    
+    const result = await followService.getMutualFollowers(parseInt(userId1), parseInt(userId2), pagination);
+    logger.info('Mutual followers retrieved:', { 
+      action: 'get_mutual_followers', 
+      userId1: parseInt(userId1), 
+      userId2: parseInt(userId2), 
+      count: result.data.length 
+    });
+    
+    return Response.paginated(res, result.data, result.pagination);
+  });
+}
+
+export default FollowController;

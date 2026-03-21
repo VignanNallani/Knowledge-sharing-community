@@ -1,139 +1,75 @@
+import { Routes, Route } from 'react-router-dom'
+import Community from './pages/Community'
+import ProfilePage from './pages/ProfilePage'
+import LeaderboardPage from './pages/LeaderboardPage'
+import MentorsPage from './pages/MentorsPage'
+import AdminPage from './pages/AdminPage'
+import Login from './pages/Login'
+import Signup from './pages/Signup'
+import LandingPage from './pages/LandingPage'
+import PostDetailPage from './pages/PostDetailPage'
+import SearchPage from './pages/SearchPage'
+import LearningPathsPage from './pages/LearningPathsPage'
+import EventsPage from './pages/EventsPage'
+import MyBookingsPage from './pages/MyBookingsPage'
+import Navbar from './components/Navbar'
+import ProtectedRoute from './components/ProtectedRoute'
+import './index.css'
 
-
-
-// import { Routes, Route } from "react-router-dom";
-
-// /* ─── Layouts ─── */
-// import AppLayout from "./layouts/AppLayout";
-// import AuthLayout from "./layouts/AuthLayout";
-
-// /* ─── Pages ─── */
-// import Feed from "./pages/Feed";
-// import SignIn from "./pages/SignIn";
-// import SignUp from "./pages/SignUp";
-// import Profile from "./pages/Profile";
-// import CreatePost from "./pages/CreatePost";
-// import PostDetail from "./pages/PostDetail";
-// import Mentors from "./pages/Mentors";
-// import MyMentorships from "./pages/MyMentorships";
-// import AdminLogin from "./pages/AdminLogin";
-// import AdminDashboard from "./pages/AdminDashboard";
-
-// /* ─── Guards & Global ─── */
-// import ProtectedRoute from "./components/ProtectedRoute";
-// import NotificationHandler from "./components/NotificationHandler";
-
-// export default function App() {
-//   return (
-//     <>
-//       {/* Global notifications */}
-//       <NotificationHandler />
-
-//       <Routes>
-//         {/* ───────────────── AUTH ───────────────── */}
-//         <Route element={<AuthLayout />}>
-//           <Route path="/signin" element={<SignIn />} />
-//           <Route path="/signup" element={<SignUp />} />
-//           <Route path="/admin" element={<AdminLogin />} />
-//         </Route>
-
-//         {/* ───────────────── USER / MENTOR APP ───────────────── */}
-//         <Route
-//           element={
-//             <ProtectedRoute>
-//               <AppLayout />
-//             </ProtectedRoute>
-//           }
-//         >
-//           <Route path="/" element={<Feed />} />
-//           <Route path="/posts/:id" element={<PostDetail />} />
-//           <Route path="/posts/new" element={<CreatePost />} />
-//           <Route path="/profile/:id" element={<Profile />} />
-//           <Route path="/mentorship" element={<Mentors />} />
-//           <Route path="/my-mentorships" element={<MyMentorships />} />
-//         </Route>
-
-//         {/* ───────────────── ADMIN ───────────────── */}
-//         <Route
-//           element={
-//             <ProtectedRoute role="ADMIN">
-//               <AppLayout />
-//             </ProtectedRoute>
-//           }
-//         >
-//           <Route path="/admin/dashboard" element={<AdminDashboard />} />
-//         </Route>
-//       </Routes>
-//     </>
-//   );
-// }
-
-
-import { Routes, Route, Navigate } from "react-router-dom";
-
-/* ─── Layouts ─── */
-import AppLayout from "./layouts/AppLayout";
-import AuthLayout from "./layouts/AuthLayout";
-
-/* ─── Pages ─── */
-import Feed from "./pages/Feed";
-import SignIn from "./pages/SignIn";
-import SignUp from "./pages/SignUp";
-import Profile from "./pages/Profile";
-import CreatePost from "./pages/CreatePost";
-import PostDetail from "./pages/PostDetail";
-import Mentors from "./pages/Mentors";
-import MyMentorships from "./pages/MyMentorships";
-import AdminLogin from "./pages/AdminLogin";
-import AdminDashboard from "./pages/AdminDashboard";
-
-/* ─── Guards & Global ─── */
-import ProtectedRoute from "./components/ProtectedRoute";
-import NotificationHandler from "./components/NotificationHandler";
-
-export default function App() {
+function App() {
   return (
-    <>
-      <NotificationHandler />
-
-      <Routes>
-        {/* ───────── AUTH ───────── */}
-        <Route element={<AuthLayout />}>
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/admin" element={<AdminLogin />} />
-        </Route>
-
-        {/* Redirect root */}
-        <Route path="/" element={<Navigate to="/community" />} />
-
-        {/* ───────── USER / MENTOR APP ───────── */}
-        <Route
-          element={
+    <div className="min-h-screen bg-[var(--bg-primary)]">
+      {/* Premium Navbar */}
+      <Navbar />
+      
+      {/* Main Content */}
+      <main>
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          
+          {/* Protected Routes */}
+          <Route path="/community" element={
             <ProtectedRoute>
-              <AppLayout />
+              <Community />
             </ProtectedRoute>
-          }
-        >
-          <Route path="/community" element={<Feed />} />
-          <Route path="/posts/:id" element={<PostDetail />} />
-          <Route path="/create" element={<CreatePost />} />
-          <Route path="/profile/:id" element={<Profile />} />
-          <Route path="/mentorship" element={<Mentors />} />
-          <Route path="/my-mentorships" element={<MyMentorships />} />
-        </Route>
-
-        {/* ───────── ADMIN ───────── */}
-        <Route
-          element={
-            <ProtectedRoute role="ADMIN">
-              <AppLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        </Route>
-      </Routes>
-    </>
-  );
+          } />
+          <Route path="/profile" element={
+            <ProtectedRoute><ProfilePage /></ProtectedRoute>
+          } />
+          <Route path="/profile/:id" element={
+            <ProtectedRoute><ProfilePage /></ProtectedRoute>
+          } />
+          <Route path="/leaderboard" element={
+            <ProtectedRoute><LeaderboardPage /></ProtectedRoute>
+          } />
+          <Route path="/mentors" element={
+            <ProtectedRoute><MentorsPage /></ProtectedRoute>
+          } />
+          <Route path="/admin" element={
+            <ProtectedRoute><AdminPage /></ProtectedRoute>
+          } />
+          <Route path="/posts/:id" element={
+            <ProtectedRoute><PostDetailPage /></ProtectedRoute>
+          } />
+          <Route path="/search" element={
+            <ProtectedRoute><SearchPage /></ProtectedRoute>
+          } />
+          <Route path="/learning-paths" element={
+            <ProtectedRoute><LearningPathsPage /></ProtectedRoute>
+          } />
+          <Route path="/events" element={
+            <ProtectedRoute><EventsPage /></ProtectedRoute>
+          } />
+          <Route path="/my-bookings" element={
+            <ProtectedRoute><MyBookingsPage /></ProtectedRoute>
+          } />
+        </Routes>
+      </main>
+    </div>
+  )
 }
+
+export default App;

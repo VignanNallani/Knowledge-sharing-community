@@ -1,217 +1,81 @@
+import BaseController from '../base/BaseController.js';
+import { ErrorFactory } from '../errors/index.js';
+import authService from '../services/auth.service.js';
+import ValidationMiddleware from '../middleware/validation.middleware.js';
+import { logger } from '../config/index.js';
+import { Response } from '../utils/ResponseBuilder.js';
 
+class AuthController extends BaseController {
+  static register = BaseController.asyncHandler(async (req, res) => {
+    // Input validation is handled by route middleware
+    const result = await authService.register(req.body);
+    logger.info('User registration:', { action: 'register', email: req.body.email });
+    return Response.created(res, result, 'User registered successfully');
+  });
 
-  // import bcrypt from "bcryptjs";
-  // import jwt from "jsonwebtoken";
-  // import prisma from "../config/prisma.js";
-
-  // /**
-  //  * REGISTER USER
-  //  */
-  // export const register = async (req, res) => {
-  //   const { name, email, password, role } = req.body;
-
-  //   if (!name || !email || !password) {
-  //     return res.status(400).json({ message: "All fields are required" });
-  //   }
-
-  //   try {
-  //     const existingUser = await prisma.user.findUnique({
-  //       where: { email },
-  //     });
-
-  //     if (existingUser) {
-  //       return res.status(409).json({ message: "User already exists" });
-  //     }
-
-  //     const hashedPassword = await bcrypt.hash(password, 10);
-
-  //     const user = await prisma.user.create({
-  //       data: {
-  //         name,
-  //         email,
-  //         password: hashedPassword,
-  //         role: role || "USER", // USER | MENTOR | ADMIN
-  //       },
-  //     });
-
-  //     res.status(201).json({
-  //       message: "User registered successfully",
-  //       user: {
-  //         id: user.id,
-  //         name: user.name,
-  //         email: user.email,
-  //         role: user.role,
-  //       },
-  //     });
-  //   } catch (err) {
-  //     console.error("REGISTER ERROR:", err);
-  //     res.status(500).json({ message: "Registration failed" });
-  //   }
-  // };
-
-  // /**
-  //  * LOGIN USER
-  //  */
-  // export const login = async (req, res) => {
-  //   const { email, password } = req.body;
-
-  //   if (!email || !password) {
-  //     return res.status(400).json({ message: "Email and password required" });
-  //   }
-
-  //   try {
-  //     const user = await prisma.user.findUnique({
-  //       where: { email },
-  //     });
-
-  //     // ❌ REMOVE isActive CHECK
-  //     if (!user) {
-  //       return res.status(401).json({ message: "Invalid credentials" });
-  //     }
-
-  //     const isMatch = await bcrypt.compare(password, user.password);
-  //     if (!isMatch) {
-  //       return res.status(401).json({ message: "Invalid credentials" });
-  //     }
-
-  //     const token = jwt.sign(
-  //       {
-  //         id: user.id,
-  //         email: user.email,
-  //         role: user.role,
-  //       },
-  //       process.env.JWT_SECRET,
-  //       { expiresIn: "7d" }
-  //     );
-
-  //     res.json({
-  //       message: "Login successful",
-  //       token,
-  //       user: {
-  //         id: user.id,
-  //         name: user.name,
-  //         email: user.email,
-  //         role: user.role,
-  //       },
-  //     });
-  //   } catch (err) {
-  //     console.error("LOGIN ERROR:", err);
-  //     res.status(500).json({ message: "Login failed" });
-  //   }
-  // };
-
-
-
-  import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-// import prisma from "../config/prisma.js";
-// import { prisma } from "../index.js";
-import prisma from "../config/prisma.js";
-
-
-/**
- * REGISTER USER
- */
-export const register = async (req, res) => {
-  const { name, email, password, role } = req.body;
-
-  if (!name || !email || !password) {
-    return res.status(400).json({ message: "All fields are required" });
-  }
-
-  try {
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
+  static login = BaseController.asyncHandler(async (req, res) => {
+    // Input validation is handled by route middleware
+    const result = await authService.login(req.body);
+    logger.info('User login:', { action: 'login', email: req.body.email });
+    
+    // Set HttpOnly cookie for refresh token
+    res.cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
-    if (existingUser) {
-      return res.status(409).json({ message: "User already exists" });
+    // Enforce HTTPS in production for secure cookies
+    if (process.env.NODE_ENV === 'production' && !process.env.HTTPS_ENABLED) {
+      throw new Error("Production requires HTTPS for secure cookies");
     }
+    
+    return Response.success(res, {
+      accessToken: result.accessToken,
+      user: result.user
+    }, 'Login successful');
+  });
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await prisma.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        role: role || "USER",
-      },
-    });
-
-    // ✅ TOKEN WAS MISSING — THIS FIXES AUTH COMPLETELY
-    const token = jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    res.status(201).json({
-      message: "User registered successfully",
-      token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-    });
-  } catch (err) {
-    console.error("REGISTER ERROR:", err);
-    res.status(500).json({ message: "Registration failed" });
-  }
-};
-
-/**
- * LOGIN USER
- */
-export const login = async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    return res.status(400).json({ message: "Email and password required" });
-  }
-
-  try {
-    const user = await prisma.user.findUnique({
-      where: { email },
-    });
-
-    if (!user) {
-      return res.status(401).json({ message: "Invalid credentials" });
+  static refresh = BaseController.asyncHandler(async (req, res) => {
+    const refreshToken = req.cookies?.refreshToken;
+    
+    if (!refreshToken) {
+      return Response.badRequest(res, 'Refresh token is required');
     }
+    
+    const result = await authService.refreshAccessToken(refreshToken);
+    logger.info('Token refreshed:', { action: 'refresh_token' });
+    return Response.success(res, result, 'Token refreshed successfully');
+  });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Invalid credentials" });
+  static logout = BaseController.asyncHandler(async (req, res) => {
+    const refreshToken = req.cookies?.refreshToken;
+    
+    if (!refreshToken) {
+      return Response.badRequest(res, 'Refresh token is required');
     }
-
-    const token = jwt.sign(
-      {
-        id: user.id,
-        email: user.email,
-        role: user.role,
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
-
-    res.json({
-      message: "Login successful",
-      token,
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
+    
+    const revoked = await authService.revokeRefreshToken(refreshToken);
+    
+    // Clear the HttpOnly cookie
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict'
     });
-  } catch (err) {
-    console.error("LOGIN ERROR:", err);
-    res.status(500).json({ message: "Login failed" });
-  }
-};
+    
+    logger.info('User logout:', { action: 'logout', revoked });
+    return Response.success(res, { revoked }, 'Logout successful');
+  });
+
+  static logoutAll = BaseController.asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+    
+    await authService.revokeAllRefreshTokens(userId);
+    logger.info('User logout all devices:', { action: 'logout_all', userId });
+    return Response.success(res, null, 'Logged out from all devices successfully');
+  });
+}
+
+export default AuthController;

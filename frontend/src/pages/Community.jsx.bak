@@ -1,0 +1,173 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import Navbar from "./components/Navbar";
+
+export default function Community() {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Navbar />
+      
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto p-6">
+      {/* Hero Section */}
+      <div className="text-center py-12">
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          Join Our Learning Community
+        </h1>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          Connect with mentors, share knowledge, and grow your skills in a supportive environment
+        </p>
+      </div>
+
+      {/* Search Bar */}
+      <div className="max-w-2xl mx-auto mb-8">
+        <Input 
+          placeholder="Search discussions, topics, or people..." 
+          className="w-full h-12 text-lg"
+        />
+      </div>
+
+      {/* Community Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <Card>
+          <CardContent className="text-center p-6">
+            <div className="text-3xl font-bold text-blue-600">2,500+</div>
+            <div className="text-gray-600 mt-2">Active Members</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="text-center p-6">
+            <div className="text-3xl font-bold text-green-600">150+</div>
+            <div className="text-gray-600 mt-2">Expert Mentors</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="text-center p-6">
+            <div className="text-3xl font-bold text-purple-600">500+</div>
+            <div className="text-gray-600 mt-2">Daily Discussions</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Topic Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>React Development</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <p className="text-gray-600 mb-4">
+              Join 2500+ developers discussing React patterns, hooks, and best practices
+            </p>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-500">1.2k members</span>
+              <Button size="sm">Join</Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>AI & Machine Learning</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <p className="text-gray-600 mb-4">
+              Explore ML algorithms, model training, and AI applications
+            </p>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-500">890 members</span>
+              <Button size="sm">Join</Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Backend Architecture</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <p className="text-gray-600 mb-4">
+              System design, databases, APIs, and cloud infrastructure
+            </p>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-500">756 members</span>
+              <Button size="sm">Join</Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Career Growth</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <p className="text-gray-600 mb-4">
+              Resume reviews, interview prep, and career guidance
+            </p>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-500">445 members</span>
+              <Button size="sm">Join</Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Open Source Projects</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <p className="text-gray-600 mb-4">
+              Contribute to meaningful projects and build your portfolio
+            </p>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-500">623 members</span>
+              <Button size="sm">Join</Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>DevOps & Cloud</CardTitle>
+          </CardHeader>
+          <CardContent className="p-6">
+            <p className="text-gray-600 mb-4">
+              Docker, Kubernetes, CI/CD, and cloud deployment
+            </p>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-500">334 members</span>
+              <Button size="sm">Join</Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Trending Discussions */}
+      <div className="mt-12">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Trending Discussions</h2>
+        <div className="space-y-4">
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-start space-x-3">
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                  <span className="text-blue-600 font-semibold">JD</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900">Best practices for React hooks in 2024?</h3>
+                  <p className="text-gray-600 text-sm mt-1">
+                    What are your favorite custom hooks and patterns you're using this year?
+                  </p>
+                  <div className="flex items-center space-x-4 mt-3">
+                    <span className="text-sm text-gray-500">45 replies</span>
+                    <span className="text-sm text-gray-500">2 hours ago</span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}

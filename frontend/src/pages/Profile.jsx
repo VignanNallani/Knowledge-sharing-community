@@ -231,29 +231,20 @@
 //   );
 // }
 
-
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../api/axios";
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export default function Profile() {
+  const { user: currentUser, isAuthenticated } = useAuth();
   const { id } = useParams();
   const [user, setUser] = useState(null);
-  const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [posts, setPosts] = useState([]);
   const [activeTab, setActiveTab] = useState("posts");
-
-  const getCurrent = () => {
-    try {
-      const token = localStorage.getItem("token");
-      if (!token) return null;
-      return JSON.parse(atob(token.split(".")[1]));
-    } catch {
-      return null;
-    }
-  };
-
-  const current = getCurrent();
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLoading(true);
@@ -269,7 +260,7 @@ export default function Profile() {
   }, [id]);
 
   const handleFollow = async () => {
-    if (!localStorage.getItem("token"))
+    if (!isAuthenticated)
       return alert("Sign in to follow");
 
     const wasFollowing = user.isFollowing;

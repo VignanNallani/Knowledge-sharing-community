@@ -1,0 +1,475 @@
+# API Flow Diagrams - Knowledge Sharing Tech Community
+
+## Overview
+This document contains detailed Mermaid flow diagrams for API request lifecycle, validation, authentication, error handling, recovery, and moderation flows.
+
+---
+
+## 1. Request Lifecycle Flow
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant LoadBalancer
+    participant APIGateway
+    participant AuthService
+    participant RateLimiter
+    participant ValidationService
+    participant BusinessService
+    participant Database
+    participant Cache
+    participant AuditService
+    
+    Client->>LoadBalancer: HTTP Request
+    LoadBalancer->>APIGateway: Forward Request
+    
+    APIGateway->>RateLimiter: Check Rate Limit
+    RateLimiter-->>APIGateway: Rate Limit Status
+    
+    alt Rate Limit Exceeded
+        APIGateway-->>Client: 429 Too Many Requests
+    else Rate Limit OK
+        APIGateway->>AuthService: Validate Token
+        AuthService-->>APIGateway: Authentication Result
+        
+        alt Authentication Failed
+            APIGateway-->>Client: 401 Unauthorized
+        else Authentication Success
+            APIGateway->>ValidationService: Validate Request
+            ValidationService-->>APIGateway: Validation Result
+            
+            alt Validation Failed
+                APIGateway-->>Client: 400 Bad Request
+            else Validation Success
+                APIGateway->>BusinessService: Process Request
+                
+                alt Cache Hit
+                    BusinessService->>Cache: Get Cached Data
+                    Cache-->>BusinessService: Cached Data
+                else Cache Miss
+                    BusinessService->>Database: Query Data
+                    Database-->>BusinessService: Query Results
+                    BusinessService->>Cache: Update Cache
+                end
+                
+                BusinessService-->>APIGateway: Processed Result
+                APIGateway->>AuditService: Log Request
+                AuditService-->>APIGateway: Log Confirmed
+                APIGateway-->>Client: 200 OK + Response
+            end
+        end
+    end
+```
+
+---
+
+## 2. Validation Flow
+
+```mermaid
+flowchart TD
+    A[Incoming Request] --> B[Schema Validation]
+    B --> C{Schema Valid?}
+    C -->|No| D[400 Bad Request]
+    C -->|Yes| E[Business Rule Validation]
+    
+    E --> F{Business Rules Valid?}
+    F -->|No| G[422 Unprocessable Entity]
+    F -->|Yes| H[Permission Validation]
+    
+    H --> I{User Has Permission?}
+    I -->|No| J[403 Forbidden]
+    I -->|Yes| K[Resource Validation]
+    
+    K --> L{Resource Exists?}
+    L -->|No| M[404 Not Found]
+    L -->|Yes| N[State Validation]
+    
+    N --> O{Resource State Valid?}
+    O -->|No| P[409 Conflict]
+    O -->|Yes| Q[Rate Limit Validation]
+    
+    Q --> R{Rate Limit OK?}
+    R -->|No| S[429 Too Many Requests]
+    R -->|Yes| T[Content Validation]
+    
+    T --> U{Content Appropriate?}
+    U -->|No| V[451 Unavailable For Legal Reasons]
+    U -->|Yes| W[Validation Passed]
+    
+    D --> X[Return Error Response]
+    G --> X
+    J --> X
+    M --> X
+    P --> X
+    S --> X
+    V --> X
+    
+    W --> Y[Proceed to Business Logic]
+    X --> Z[Log Validation Failure]
+```
+
+---
+
+## 3. Authentication Flow
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant APIGateway
+    participant AuthService
+    participant TokenService
+    participant UserService
+    participant TrustService
+    participant Cache
+    participant AuditService
+    
+    Client->>APIGateway: Request + JWT Token
+    APIGateway->>AuthService: Validate Token
+    
+    AuthService->>Cache: Check Token Cache
+    alt Token in Cache
+        Cache-->>AuthService: Cached Token Data
+    else Token Not Cached
+        AuthService->>TokenService: Verify JWT Signature
+        TokenService-->>AuthService: Signature Valid
+        
+        alt Signature Invalid
+            AuthService-->>APIGateway: Invalid Token
+            APIGateway-->>Client: 401 Unauthorized
+        else Signature Valid
+            AuthService->>UserService: Get User Data
+            UserService-->>AuthService: User Information
+            
+            AuthService->>TrustService: Get Trust Score
+            TrustService-->>AuthService: Trust Score
+            
+            AuthService->>Cache: Cache Token Data
+            Cache-->>AuthService: Cache Confirmed
+        end
+    end
+    
+    AuthService->>AuditService: Log Authentication Attempt
+    AuditService-->>AuthService: Log Confirmed
+    
+    AuthService-->>APIGateway: Authentication Result
+    
+    alt Authentication Failed
+        APIGateway-->>Client: 401 Unauthorized
+    else Authentication Success
+        APIGateway->>Client: Continue Processing
+    end
+```
+
+---
+
+## 4. Error Flow
+
+```mermaid
+flowchart TD
+    A[Error Occurred] --> B{Error Type}
+    B -->|Validation Error| C[Client Error 4xx]
+    B -->|Business Logic Error| C
+    B -->|Permission Error| C
+    B -->|System Error| D[Server Error 5xx]
+    B -->|Database Error| D
+    B -->|Network Error| D
+    
+    C --> E[Format Error Response]
+    D --> F[Generate Error ID]
+    
+    F --> G[Log Full Error Details]
+    G --> H[Sanitize Error for Client]
+    H --> I[Check Error Sensitivity]
+    
+    I -->|Sensitive| J[Generic Error Message]
+    I -->|Non-Sensitive| K[Detailed Error Message]
+    
+    J --> L[Create Error Response]
+    K --> L
+    
+    E --> M{Development Environment?}
+    L --> M
+    
+    M -->|Yes| N[Include Stack Trace]
+    M -->|No| O[Minimal Error Info]
+    
+    N --> P[Return Error Response]
+    O --> P
+    
+    P --> Q[Update Error Metrics]
+    Q --> R[Alert if Critical]
+    R --> S[Monitor Error Patterns]
+```
+
+---
+
+## 5. Recovery Flow
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant APIGateway
+    participant CircuitBreaker
+    participant RetryService
+    participant BusinessService
+    participant HealthChecker
+    participant Cache
+    participant Monitoring
+    
+    Client->>APIGateway: Request
+    APIGateway->>CircuitBreaker: Check Circuit State
+    
+    alt Circuit Open
+        CircuitBreaker-->>APIGateway: Circuit Open
+        APIGateway->>Cache: Try Fallback Cache
+        alt Cache Hit
+            Cache-->>APIGateway: Cached Response
+            APIGateway-->>Client: Cached Response
+        else Cache Miss
+            APIGateway-->>Client: 503 Service Unavailable
+        end
+    else Circuit Closed
+        CircuitBreaker-->>APIGateway: Circuit Closed
+        APIGateway->>BusinessService: Process Request
+        
+        alt Service Failure
+            BusinessService-->>APIGateway: Error Response
+            APIGateway->>RetryService: Check Retry Policy
+            
+            alt Retry Allowed
+                RetryService-->>APIGateway: Retry Permitted
+                APIGateway->>BusinessService: Retry Request
+                
+                alt Retry Success
+                    BusinessService-->>APIGateway: Success Response
+                    APIGateway-->>Client: Success Response
+                else Retry Failure
+                    BusinessService-->>APIGateway: Error Response
+                    APIGateway->>CircuitBreaker: Report Failure
+                    CircuitBreaker->>CircuitBreaker: Update Failure Count
+                    
+                    alt Threshold Reached
+                        CircuitBreaker->>CircuitBreaker: Open Circuit
+                        APIGateway->>Client: 503 Service Unavailable
+                    else Below Threshold
+                        APIGateway->>Client: 500 Internal Server Error
+                    end
+                end
+            else No Retry
+                RetryService-->>APIGateway: No Retry
+                APIGateway-->>Client: 500 Internal Server Error
+            end
+        else Service Success
+            BusinessService-->>APIGateway: Success Response
+            APIGateway->>CircuitBreaker: Report Success
+            CircuitBreaker->>CircuitBreaker: Reset Failure Count
+            APIGateway-->>Client: Success Response
+        end
+    end
+    
+    APIGateway->>Monitoring: Update Health Metrics
+    HealthChecker->>Monitoring: Periodic Health Check
+```
+
+---
+
+## 6. Moderation API Flow
+
+```mermaid
+sequenceDiagram
+    participant Reporter
+    participant ModerationAPI
+    participant ValidationService
+    participant QueueService
+    participant Moderator
+    participant NotificationService
+    participant AuditService
+    participant TrustService
+    participant Database
+    
+    Reporter->>ModerationAPI: Submit Report
+    ModerationAPI->>ValidationService: Validate Report
+    
+    alt Validation Failed
+        ValidationService-->>ModerationAPI: Validation Errors
+        ModerationAPI-->>Reporter: 400 Bad Request
+    else Validation Success
+        ModerationAPI->>Database: Save Report
+        Database-->>ModerationAPI: Report Saved
+        
+        ModerationAPI->>QueueService: Queue for Review
+        QueueService-->>ModerationAPI: Queued Successfully
+        
+        ModerationAPI->>AuditService: Log Report Creation
+        AuditService-->>ModerationAPI: Log Confirmed
+        
+        ModerationAPI-->>Reporter: 202 Accepted + Report ID
+        
+        QueueService->>Moderator: Assign Report
+        Moderator->>ModerationAPI: Start Review
+        
+        ModerationAPI->>Database: Get Report Details
+        Database-->>ModerationAPI: Report Data
+        
+        Moderator->>ModerationAPI: Submit Decision
+        ModerationAPI->>ValidationService: Validate Decision
+        
+        alt Decision Valid
+            ValidationService-->>ModerationAPI: Decision Valid
+            ModerationAPI->>Database: Update Report Status
+            Database-->>ModerationAPI: Status Updated
+            
+            ModerationAPI->>TrustService: Update Trust Scores
+            TrustService-->>ModerationAPI: Scores Updated
+            
+            ModerationAPI->>NotificationService: Notify Parties
+            NotificationService-->>ModerationAPI: Notifications Sent
+            
+            ModerationAPI->>AuditService: Log Decision
+            AuditService-->>ModerationAPI: Log Confirmed
+            
+            ModerationAPI-->>Moderator: Decision Processed
+        else Decision Invalid
+            ValidationService-->>ModerationAPI: Decision Errors
+            ModerationAPI-->>Moderator: 400 Bad Request
+        end
+    end
+```
+
+---
+
+## 7. Content Creation API Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant ContentAPI
+    participant ValidationService
+    participant TrustService
+    participant ModerationService
+    participant ContentService
+    participant SearchService
+    participant Cache
+    participant Database
+    participant NotificationService
+    
+    User->>ContentAPI: Create Content
+    ContentAPI->>ValidationService: Validate Content
+    
+    alt Validation Failed
+        ValidationService-->>ContentAPI: Validation Errors
+        ContentAPI-->>User: 400 Bad Request
+    else Validation Success
+        ContentAPI->>TrustService: Check Trust Score
+        TrustService-->>ContentAPI: Trust Score
+        
+        alt Trust Score Low
+            TrustService-->>ContentAPI: Review Required
+            ContentAPI->>ModerationService: Queue for Review
+            ModerationService-->>ContentAPI: Queued
+            
+            ContentAPI->>Database: Save as Pending
+            Database-->>ContentAPI: Content Saved
+            
+            ContentAPI->>User: 202 Accepted + Review Status
+        else Trust Score High
+            TrustService-->>ContentAPI: Auto-Approve
+            ContentAPI->>ContentService: Process Content
+            ContentService->>Database: Save Content
+            Database-->>ContentService: Content Saved
+            
+            ContentService->>SearchService: Update Search Index
+            SearchService-->>ContentService: Index Updated
+            
+            ContentService->>Cache: Update Cache
+            Cache-->>ContentService: Cache Updated
+            
+            ContentService->>NotificationService: Notify Followers
+            NotificationService-->>ContentService: Notifications Sent
+            
+            ContentService-->>ContentAPI: Content Published
+            ContentAPI--->User: 201 Created + Content ID
+        end
+    end
+```
+
+---
+
+## 8. User Management API Flow
+
+```mermaid
+sequenceDiagram
+    participant Admin
+    participant UserAPI
+    participant AuthService
+    participant ValidationService
+    participant UserService
+    participant TrustService
+    participant AuditService
+    participant Database
+    participant NotificationService
+    
+    Admin->>UserAPI: Update User Status
+    UserAPI->>AuthService: Verify Admin Permissions
+    AuthService-->>UserAPI: Admin Confirmed
+    
+    UserAPI->>ValidationService: Validate Update Request
+    ValidationService-->>UserAPI: Validation Result
+    
+    alt Validation Failed
+        UserAPI-->>Admin: 400 Bad Request
+    else Validation Success
+        UserAPI->>UserService: Get User Details
+        UserService->>Database: Query User
+        Database-->>UserService: User Data
+        UserService-->>UserAPI: User Details
+        
+        UserAPI->>TrustService: Calculate Trust Impact
+        TrustService-->>UserAPI: Trust Impact
+        
+        UserAPI->>Database: Update User Status
+        Database-->>UserAPI: Status Updated
+        
+        UserAPI->>AuthService: Update User Sessions
+        AuthService-->>UserAPI: Sessions Updated
+        
+        UserAPI->>AuditService: Log Status Change
+        AuditService-->>UserAPI: Log Confirmed
+        
+        UserAPI->>NotificationService: Notify User
+        NotificationService-->>UserAPI: Notification Sent
+        
+        UserAPI-->>Admin: 200 OK + Updated Status
+    end
+```
+
+---
+
+## API Performance Considerations
+
+### Response Time Targets
+- **Authentication**: < 100ms
+- **Validation**: < 50ms
+- **Simple Queries**: < 200ms
+- **Complex Operations**: < 500ms
+- **File Uploads**: < 5s per MB
+
+### Rate Limiting Strategy
+- **Authenticated Users**: 1000 requests/hour
+- **Unauthenticated Users**: 100 requests/hour
+- **Admin Users**: 5000 requests/hour
+- **Burst Allowance**: 10% of hourly limit
+
+### Caching Strategy
+- **User Data**: 15 minutes
+- **Content Metadata**: 30 minutes
+- **Configuration**: 1 hour
+- **Static Data**: 24 hours
+
+### Error Rate Monitoring
+- **Acceptable Error Rate**: < 0.1%
+- **Critical Error Threshold**: > 1%
+- **Response Time Alert**: > 2s average
+- **Circuit Breaker Threshold**: 5 failures in 5 minutes
+
+These API flow diagrams ensure consistent, reliable, and performant API interactions across the Knowledge Sharing Tech Community platform.

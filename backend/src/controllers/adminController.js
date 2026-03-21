@@ -1,75 +1,36 @@
-// // controllers/adminController.js
-// import { PrismaClient } from "@prisma/client";
-// const prisma = new PrismaClient();
-
-// export const getDashboard = async (req, res) => {
-//   const totalUsers = await prisma.user.count();
-//   const totalPosts = await prisma.post.count();
-//   const totalComments = await prisma.comment.count();
-//   const totalEvents = await prisma.event.count();
-//   res.json({ totalUsers, totalPosts, totalComments, totalEvents });
-// };
-
-// export const getAllUsers = async (req, res) => {
-//   const users = await prisma.user.findMany();
-//   res.json(users);
-// };
-
-
-import { PrismaClient, ActivityType } from "@prisma/client";
-import { logActivity } from "../services/activityService.js";
-
-const prisma = new PrismaClient();
+import ApiResponse from "../utils/ApiResponse.js";
+import { ApiError } from "../utils/ApiError.js";
+import asyncHandler from "../middleware/asyncHandler.js";
+import { paginate } from "../utils/pagination.js";
+import adminService from "../services/admin.service.js";
 
 /* ================= PENDING POSTS ================= */
-export const getPendingPosts = async (req, res) => {
-  const posts = await prisma.post.findMany({
-    where: { status: "PENDING" },
-    include: {
-      author: { select: { id: true, name: true } },
-    },
-    orderBy: { createdAt: "desc" },
+export const getPendingPosts = asyncHandler(async (req, res) => {
+  const result = await adminService.getPendingPosts(req.query);
+  
+  return ApiResponse.success(res, { 
+    message: 'Pending posts fetched', 
+    data: { posts: result.posts },
+    meta: result.meta
   });
-
-  res.json(posts);
-};
+});
 
 /* ================= APPROVE POST ================= */
-export const approvePost = async (req, res) => {
+export const approvePost = asyncHandler(async (req, res) => {
   const postId = parseInt(req.params.id);
+  if (isNaN(postId)) throw new ApiError(400, 'Invalid post ID');
 
-  const post = await prisma.post.update({
-    where: { id: postId },
-    data: { status: "APPROVED" },
-  });
-
-  await logActivity({
-    type: ActivityType.POST_APPROVED,
-    message: `approved post "${post.title}"`,
-    userId: req.user.id,
-    entity: "POST",
-    entityId: post.id,
-  });
-
-  res.json({ message: "Post approved" });
-};
+  const updatedPost = await adminService.approvePost(postId, req.user.id);
+  
+  return ApiResponse.success(res, { message: 'Post approved', data: updatedPost });
+});
 
 /* ================= REJECT POST ================= */
-export const rejectPost = async (req, res) => {
+export const rejectPost = asyncHandler(async (req, res) => {
   const postId = parseInt(req.params.id);
+  if (isNaN(postId)) throw new ApiError(400, 'Invalid post ID');
 
-  await prisma.post.update({
-    where: { id: postId },
-    data: { status: "REJECTED" },
-  });
-
-  await logActivity({
-    type: ActivityType.POST_REJECTED,
-    message: `rejected a post`,
-    userId: req.user.id,
-    entity: "POST",
-    entityId: postId,
-  });
-
-  res.json({ message: "Post rejected" });
-};
+  const updatedPost = await adminService.rejectPost(postId, req.user.id);
+  
+  return ApiResponse.success(res, { message: 'Post rejected', data: updatedPost });
+});

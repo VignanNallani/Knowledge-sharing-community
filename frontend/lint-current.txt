@@ -1,0 +1,744 @@
+
+> frontend@0.0.0 lint
+> eslint .
+
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\public\common.js
+  17:12  error  'e' is defined but never used              no-unused-vars
+  22:36  error  'type' is assigned a value but never used  no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\public\messages.js
+   9:12   error  'el' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  24:25   error  'authFetch' is not defined                                                 no-undef
+  24:38   error  'API_BASE' is not defined                                                  no-undef
+  50:25   error  'authFetch' is not defined                                                 no-undef
+  50:38   error  'API_BASE' is not defined                                                  no-undef
+  58:108  error  'formatDate' is not defined                                                no-undef
+  73:35   error  'showToast' is not defined                                                 no-undef
+  75:25   error  'authFetch' is not defined                                                 no-undef
+  75:38   error  'API_BASE' is not defined                                                  no-undef
+  79:52   error  'showToast' is not defined                                                 no-undef
+  84:7    error  'showToast' is not defined                                                 no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\public\slots.js
+  13:25  error  'authFetch' is not defined  no-undef
+  37:29  error  'authFetch' is not defined  no-undef
+  38:54  error  'showToast' is not defined  no-undef
+  39:13  error  'showToast' is not defined  no-undef
+  41:47  error  'showToast' is not defined  no-undef
+  54:27  error  'showToast' is not defined  no-undef
+  56:25  error  'authFetch' is not defined  no-undef
+  57:52  error  'showToast' is not defined  no-undef
+  58:7   error  'showToast' is not defined  no-undef
+  64:7   error  'showToast' is not defined  no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\api\skillGap.api.js
+  428:12  error  Parsing error: Unexpected keyword 'export'
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\Chat.jsx
+  20:6  warning  React Hook useEffect has an unnecessary dependency: 'socket'. Either exclude it or remove the dependency array. Outer scope values like 'socket' aren't valid dependencies because mutating them doesn't re-render the component  react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\ErrorBoundary.jsx
+  10:35  error  'error' is defined but never used  no-unused-vars
+  81:14  error  'process' is not defined           no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\GlobalToastProvider.jsx
+  36:6  warning  React Hook useEffect has a missing dependency: 'addToast'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\PostCard-Layer2.jsx
+  12:3   error  'currentUser' is defined but never used  no-unused-vars
+  52:14  error  'error' is defined but never used        no-unused-vars
+  91:14  error  'error' is defined but never used        no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\PostCard.jsx
+  143:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u         no-unused-vars
+  151:11  error  'user' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\ProtectedRoute-Layer2.jsx
+   1:27  error  'useEffect' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                    no-unused-vars
+   4:10  error  'useSafeState' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                 no-unused-vars
+  14:10  error  'permissionError' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u     no-unused-vars
+  14:27  error  'setPermissionError' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\RecommendedContentCards.jsx
+  28:36  error    'healthApi' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                             no-unused-vars
+  50:7   error    'skillGapService' is not defined                                                                                                                             no-undef
+  51:7   error    'skillGapService' is not defined                                                                                                                             no-undef
+  62:7   error    'skillGapService' is not defined                                                                                                                             no-undef
+  64:6   warning  React Hook useEffect has missing dependencies: 'handleRecommendationsUpdated' and 'handleStatusUpdated'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\SkeletonComment.jsx
+  21:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\SkeletonPost.jsx
+  41:10  error  'motion' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\SkillGapDashboard.jsx
+  23:23  error    'healthApi' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                             no-unused-vars
+  52:7   error    'skillGapService' is not defined                                                                                                                                             no-undef
+  53:7   error    'skillGapService' is not defined                                                                                                                                             no-undef
+  54:7   error    'skillGapService' is not defined                                                                                                                                             no-undef
+  56:6   warning  React Hook useEffect has missing dependencies: 'handleGapClosed', 'handleProgressUpdated', and 'handleSkillGapsUpdated'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\ToastProvider.jsx
+  5:17  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\analytics\AIAnalyticsDashboard.jsx
+   72:10  error    'selectedPrediction' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                   no-unused-vars
+   72:30  error    'setSelectedPrediction' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                no-unused-vars
+  133:6   warning  React Hook useEffect has missing dependencies: 'loadAnalyticsData', 'loadInsights', 'loadMetrics', 'loadPredictions', and 'loadRecommendations'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  145:6   warning  React Hook useEffect has missing dependencies: 'loadAnalyticsData' and 'loadMetrics'. Either include them or remove the dependency array                                                             react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\analytics\AnalyticsDashboard.jsx
+  48:6  warning  React Hook useEffect has a missing dependency: 'fetchAnalyticsData'. Either include it or remove the dependency array                                      react-hooks/exhaustive-deps
+  63:6  warning  React Hook useEffect has missing dependencies: 'handleAnalyticsUpdate' and 'handleUserActivityUpdate'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\analytics\__tests__\AnalyticsDashboard.test.jsx
+    9:1   error  'jest' is not defined  no-undef
+   28:1   error  'jest' is not defined  no-undef
+   46:1   error  'jest' is not defined  no-undef
+   47:1   error  'jest' is not defined  no-undef
+  124:5   error  'jest' is not defined  no-undef
+  135:17  error  'jest' is not defined  no-undef
+  136:18  error  'jest' is not defined  no-undef
+  137:22  error  'jest' is not defined  no-undef
+  142:18  error  'jest' is not defined  no-undef
+  143:18  error  'jest' is not defined  no-undef
+  144:21  error  'jest' is not defined  no-undef
+  151:14  error  'jest' is not defined  no-undef
+  155:14  error  'jest' is not defined  no-undef
+  160:31  error  'jest' is not defined  no-undef
+  163:14  error  'jest' is not defined  no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\analytics\__tests__tests__AIAnalyticsDashboard.test.jsx
+  221:7  error  Parsing error: Cannot use keyword 'await' outside an async function
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\feed\ActivityFeed.jsx
+  38:6  warning  React Hook useEffect has a missing dependency: 'fetchActivities'. Either include it or remove the dependency array                                                                                                  react-hooks/exhaustive-deps
+  59:6  warning  React Hook useEffect has missing dependencies: 'handleActivityUpdate', 'handleCommentAdded', 'handleFollowUpdate', 'handlePostLike', and 'handleSessionUpdate'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\feed\PostList.jsx
+  62:25  error  React Hook "useMemo" is called conditionally. React Hooks must be called in the exact same order in every component render. Did you accidentally call a React Hook after an early return?  react-hooks/rules-of-hooks
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\gamification\AchievementNotifications.jsx
+  299:17  error  Parsing error: Unexpected token `}`. Did you mean `&rbrace;` or `{"}"}`?
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\gamification\BadgeShowcase.jsx
+  10:3  error    'animated' is assigned a value but never used                                                                         no-unused-vars
+  25:6  warning  React Hook useEffect has a missing dependency: 'fetchBadges'. Either include it or remove the dependency array        react-hooks/exhaustive-deps
+  38:6  warning  React Hook useEffect has a missing dependency: 'handleBadgeEarned'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\gamification\LeaderboardsPage.jsx
+   38:6   warning  React Hook useEffect has missing dependencies: 'fetchLeaderboards' and 'fetchUserRank'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+   51:6   warning  React Hook useEffect has a missing dependency: 'handleLeaderboardUpdate'. Either include it or remove the dependency array                  react-hooks/exhaustive-deps
+  352:49  error    'index' is defined but never used                                                                                                           no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\gamification\PointsDisplay.jsx
+  23:6  warning  React Hook useEffect has a missing dependency: 'fetchPoints'. Either include it or remove the dependency array                               react-hooks/exhaustive-deps
+  38:6  warning  React Hook useEffect has missing dependencies: 'handleLevelUp' and 'handlePointsUpdate'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\gamification\__tests__\AchievementNotifications.test.jsx
+     7:1   error  'jest' is not defined     no-undef
+     8:1   error  'jest' is not defined     no-undef
+    12:14  error  'jest' is not defined     no-undef
+    13:9   error  'jest' is not defined     no-undef
+    14:10  error  'jest' is not defined     no-undef
+    20:12  error  'jest' is not defined     no-undef
+    21:12  error  'jest' is not defined     no-undef
+    22:15  error  'jest' is not defined     no-undef
+    23:10  error  'jest' is not defined     no-undef
+    25:1   error  'global' is not defined   no-undef
+    65:5   error  'jest' is not defined     no-undef
+    67:5   error  'jest' is not defined     no-undef
+    71:5   error  'jest' is not defined     no-undef
+    72:5   error  'jest' is not defined     no-undef
+   111:22  error  'require' is not defined  no-undef
+   120:22  error  'require' is not defined  no-undef
+   129:22  error  'require' is not defined  no-undef
+   141:22  error  'require' is not defined  no-undef
+   157:22  error  'require' is not defined  no-undef
+   181:22  error  'require' is not defined  no-undef
+   202:22  error  'require' is not defined  no-undef
+   221:7   error  'jest' is not defined     no-undef
+   229:22  error  'require' is not defined  no-undef
+   265:22  error  'require' is not defined  no-undef
+   297:22  error  'require' is not defined  no-undef
+   320:22  error  'require' is not defined  no-undef
+   341:22  error  'require' is not defined  no-undef
+   363:22  error  'require' is not defined  no-undef
+   385:22  error  'require' is not defined  no-undef
+   405:22  error  'require' is not defined  no-undef
+   427:22  error  'require' is not defined  no-undef
+   449:22  error  'require' is not defined  no-undef
+   469:22  error  'require' is not defined  no-undef
+   497:22  error  'require' is not defined  no-undef
+   524:22  error  'require' is not defined  no-undef
+   546:7   error  'jest' is not defined     no-undef
+   556:7   error  'jest' is not defined     no-undef
+   564:22  error  'require' is not defined  no-undef
+   603:22  error  'require' is not defined  no-undef
+   641:22  error  'require' is not defined  no-undef
+   661:22  error  'require' is not defined  no-undef
+   688:22  error  'require' is not defined  no-undef
+   717:22  error  'require' is not defined  no-undef
+   739:22  error  'require' is not defined  no-undef
+   760:22  error  'require' is not defined  no-undef
+   783:22  error  'require' is not defined  no-undef
+   796:22  error  'require' is not defined  no-undef
+   826:22  error  'require' is not defined  no-undef
+   851:22  error  'require' is not defined  no-undef
+   862:7   error  'global' is not defined   no-undef
+   863:7   error  'global' is not defined   no-undef
+   877:22  error  'require' is not defined  no-undef
+   888:7   error  'global' is not defined   no-undef
+   889:7   error  'global' is not defined   no-undef
+   905:22  error  'require' is not defined  no-undef
+   918:22  error  'require' is not defined  no-undef
+   947:22  error  'require' is not defined  no-undef
+   969:22  error  'require' is not defined  no-undef
+   988:7   error  'jest' is not defined     no-undef
+   996:22  error  'require' is not defined  no-undef
+  1026:22  error  'require' is not defined  no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\gamification\__tests__\BadgeShowcase.test.jsx
+    7:1   error  'jest' is not defined     no-undef
+    8:1   error  'jest' is not defined     no-undef
+   12:14  error  'jest' is not defined     no-undef
+   13:9   error  'jest' is not defined     no-undef
+   14:10  error  'jest' is not defined     no-undef
+   20:12  error  'jest' is not defined     no-undef
+   21:12  error  'jest' is not defined     no-undef
+   22:15  error  'jest' is not defined     no-undef
+   23:10  error  'jest' is not defined     no-undef
+   25:1   error  'global' is not defined   no-undef
+   62:5   error  'jest' is not defined     no-undef
+   67:5   error  'jest' is not defined     no-undef
+   72:35  error  'require' is not defined  no-undef
+   86:35  error  'require' is not defined  no-undef
+   98:35  error  'require' is not defined  no-undef
+  111:35  error  'require' is not defined  no-undef
+  123:35  error  'require' is not defined  no-undef
+  132:35  error  'require' is not defined  no-undef
+  143:35  error  'require' is not defined  no-undef
+  172:35  error  'require' is not defined  no-undef
+  232:35  error  'require' is not defined  no-undef
+  233:22  error  'require' is not defined  no-undef
+  246:35  error  'require' is not defined  no-undef
+  247:22  error  'require' is not defined  no-undef
+  260:35  error  'require' is not defined  no-undef
+  261:22  error  'require' is not defined  no-undef
+  300:35  error  'require' is not defined  no-undef
+  301:22  error  'require' is not defined  no-undef
+  320:35  error  'require' is not defined  no-undef
+  341:35  error  'require' is not defined  no-undef
+  366:35  error  'require' is not defined  no-undef
+  395:35  error  'require' is not defined  no-undef
+  415:35  error  'require' is not defined  no-undef
+  438:35  error  'require' is not defined  no-undef
+  439:22  error  'require' is not defined  no-undef
+  476:35  error  'require' is not defined  no-undef
+  477:22  error  'require' is not defined  no-undef
+  516:35  error  'require' is not defined  no-undef
+  529:35  error  'require' is not defined  no-undef
+  543:35  error  'require' is not defined  no-undef
+  544:22  error  'require' is not defined  no-undef
+  584:35  error  'require' is not defined  no-undef
+  596:35  error  'require' is not defined  no-undef
+  618:35  error  'require' is not defined  no-undef
+  619:22  error  'require' is not defined  no-undef
+  639:35  error  'require' is not defined  no-undef
+  643:7   error  'global' is not defined   no-undef
+  644:7   error  'global' is not defined   no-undef
+  657:35  error  'require' is not defined  no-undef
+  661:7   error  'global' is not defined   no-undef
+  662:7   error  'global' is not defined   no-undef
+  677:35  error  'require' is not defined  no-undef
+  694:35  error  'require' is not defined  no-undef
+  716:35  error  'require' is not defined  no-undef
+  731:35  error  'require' is not defined  no-undef
+  760:35  error  'require' is not defined  no-undef
+  789:35  error  'require' is not defined  no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\gamification\__tests__\LeaderboardsPage.test.jsx
+    7:1   error  'jest' is not defined     no-undef
+    8:1   error  'jest' is not defined     no-undef
+   12:14  error  'jest' is not defined     no-undef
+   13:9   error  'jest' is not defined     no-undef
+   14:10  error  'jest' is not defined     no-undef
+   20:12  error  'jest' is not defined     no-undef
+   21:12  error  'jest' is not defined     no-undef
+   22:15  error  'jest' is not defined     no-undef
+   23:10  error  'jest' is not defined     no-undef
+   25:1   error  'global' is not defined   no-undef
+   78:5   error  'jest' is not defined     no-undef
+   83:5   error  'jest' is not defined     no-undef
+   88:35  error  'require' is not defined  no-undef
+  104:35  error  'require' is not defined  no-undef
+  119:35  error  'require' is not defined  no-undef
+  134:35  error  'require' is not defined  no-undef
+  147:35  error  'require' is not defined  no-undef
+  157:35  error  'require' is not defined  no-undef
+  169:35  error  'require' is not defined  no-undef
+  190:35  error  'require' is not defined  no-undef
+  206:35  error  'require' is not defined  no-undef
+  207:22  error  'require' is not defined  no-undef
+  221:35  error  'require' is not defined  no-undef
+  222:22  error  'require' is not defined  no-undef
+  236:35  error  'require' is not defined  no-undef
+  237:22  error  'require' is not defined  no-undef
+  265:35  error  'require' is not defined  no-undef
+  266:22  error  'require' is not defined  no-undef
+  286:35  error  'require' is not defined  no-undef
+  306:35  error  'require' is not defined  no-undef
+  327:35  error  'require' is not defined  no-undef
+  346:35  error  'require' is not defined  no-undef
+  367:35  error  'require' is not defined  no-undef
+  398:35  error  'require' is not defined  no-undef
+  427:35  error  'require' is not defined  no-undef
+  457:35  error  'require' is not defined  no-undef
+  501:35  error  'require' is not defined  no-undef
+  532:35  error  'require' is not defined  no-undef
+  551:35  error  'require' is not defined  no-undef
+  552:22  error  'require' is not defined  no-undef
+  581:35  error  'require' is not defined  no-undef
+  595:35  error  'require' is not defined  no-undef
+  610:35  error  'require' is not defined  no-undef
+  611:22  error  'require' is not defined  no-undef
+  641:35  error  'require' is not defined  no-undef
+  654:35  error  'require' is not defined  no-undef
+  679:35  error  'require' is not defined  no-undef
+  680:22  error  'require' is not defined  no-undef
+  701:35  error  'require' is not defined  no-undef
+  706:7   error  'global' is not defined   no-undef
+  707:7   error  'global' is not defined   no-undef
+  720:35  error  'require' is not defined  no-undef
+  725:7   error  'global' is not defined   no-undef
+  726:7   error  'global' is not defined   no-undef
+  741:35  error  'require' is not defined  no-undef
+  760:35  error  'require' is not defined  no-undef
+  782:35  error  'require' is not defined  no-undef
+  798:35  error  'require' is not defined  no-undef
+  828:35  error  'require' is not defined  no-undef
+  856:35  error  'require' is not defined  no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\gamification\__tests__\PointsDisplay.test.jsx
+    7:1   error  'jest' is not defined     no-undef
+    8:1   error  'jest' is not defined     no-undef
+   12:14  error  'jest' is not defined     no-undef
+   13:9   error  'jest' is not defined     no-undef
+   14:10  error  'jest' is not defined     no-undef
+   20:12  error  'jest' is not defined     no-undef
+   21:12  error  'jest' is not defined     no-undef
+   22:15  error  'jest' is not defined     no-undef
+   23:10  error  'jest' is not defined     no-undef
+   25:1   error  'global' is not defined   no-undef
+   35:5   error  'jest' is not defined     no-undef
+   40:5   error  'jest' is not defined     no-undef
+   45:35  error  'require' is not defined  no-undef
+   57:35  error  'require' is not defined  no-undef
+   69:35  error  'require' is not defined  no-undef
+   82:35  error  'require' is not defined  no-undef
+   95:35  error  'require' is not defined  no-undef
+  104:35  error  'require' is not defined  no-undef
+  115:35  error  'require' is not defined  no-undef
+  131:35  error  'require' is not defined  no-undef
+  149:35  error  'require' is not defined  no-undef
+  150:22  error  'require' is not defined  no-undef
+  163:35  error  'require' is not defined  no-undef
+  164:22  error  'require' is not defined  no-undef
+  177:35  error  'require' is not defined  no-undef
+  178:22  error  'require' is not defined  no-undef
+  213:35  error  'require' is not defined  no-undef
+  214:22  error  'require' is not defined  no-undef
+  248:35  error  'require' is not defined  no-undef
+  249:22  error  'require' is not defined  no-undef
+  269:35  error  'require' is not defined  no-undef
+  270:22  error  'require' is not defined  no-undef
+  301:35  error  'require' is not defined  no-undef
+  302:22  error  'require' is not defined  no-undef
+  334:35  error  'require' is not defined  no-undef
+  361:35  error  'require' is not defined  no-undef
+  381:35  error  'require' is not defined  no-undef
+  393:35  error  'require' is not defined  no-undef
+  405:35  error  'require' is not defined  no-undef
+  406:22  error  'require' is not defined  no-undef
+  439:35  error  'require' is not defined  no-undef
+  451:35  error  'require' is not defined  no-undef
+  473:35  error  'require' is not defined  no-undef
+  474:22  error  'require' is not defined  no-undef
+  494:35  error  'require' is not defined  no-undef
+  498:7   error  'global' is not defined   no-undef
+  499:7   error  'global' is not defined   no-undef
+  512:35  error  'require' is not defined  no-undef
+  516:7   error  'global' is not defined   no-undef
+  517:7   error  'global' is not defined   no-undef
+  532:35  error  'require' is not defined  no-undef
+  549:35  error  'require' is not defined  no-undef
+  571:35  error  'require' is not defined  no-undef
+  586:35  error  'require' is not defined  no-undef
+  602:35  error  'require' is not defined  no-undef
+  618:35  error  'require' is not defined  no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\learning\LearningPathDashboard.jsx
+   44:3   error    'showRecommendations' is assigned a value but never used                                                              no-unused-vars
+  120:6   warning  React Hook useEffect has a missing dependency: 'loadLearningPaths'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  131:6   warning  React Hook useEffect has a missing dependency: 'loadLearningPaths'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  696:3   error    'getProgressColor' is defined but never used                                                                          no-unused-vars
+  781:34  error    'index' is defined but never used                                                                                     no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\mentoring\MentorRecommendationCards.jsx
+  68:10  error  Parsing error: Identifier 'showFilters' has already been declared
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\mentorship\BookingCalendar.jsx
+  2:48  error  'getMentorSessions' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  3:40  error  'addWeeks' is defined but never used. Allowed unused vars must match /^[A-Z_]/u           no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\mentorship\MentorAvailabilityManager.jsx
+  515:1  error  Parsing error: Unexpected token `}`. Did you mean `&rbrace;` or `{"}"}`?
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\mentorship\MentorDashboard.jsx
+   1:38  error  'useCallback' is defined but never used. Allowed unused vars must match /^[A-Z_]/u    no-unused-vars
+  14:10  error  'user' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\mentorship\SessionDetail.jsx
+   1:38  error  'useCallback' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  58:20  error  'err' is defined but never used                                                     no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\mentorship\__tests__\FeedbackForm.test.jsx
+    7:1   error  'jest' is not defined  no-undef
+   10:1   error  'jest' is not defined  no-undef
+   38:5   error  'jest' is not defined  no-undef
+  139:22  error  'jest' is not defined  no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\mentorship\__tests__\MentorDashboard.test.jsx
+    9:1   error  'jest' is not defined                  no-undef
+   10:1   error  'jest' is not defined                  no-undef
+   13:1   error  'jest' is not defined                  no-undef
+   14:11  error  'jest' is not defined                  no-undef
+   14:20  error  'date' is defined but never used       no-unused-vars
+   14:26  error  'formatStr' is defined but never used  no-unused-vars
+   18:1   error  'jest' is not defined                  no-undef
+   59:5   error  'jest' is not defined                  no-undef
+   64:18  error  'jest' is not defined                  no-undef
+   65:18  error  'jest' is not defined                  no-undef
+   66:21  error  'jest' is not defined                  no-undef
+   78:5   error  The members of 'socket' are read-only  no-import-assign
+   78:28  error  'jest' is not defined                  no-undef
+   79:5   error  The members of 'socket' are read-only  no-import-assign
+   79:29  error  'jest' is not defined                  no-undef
+   80:5   error  The members of 'socket' are read-only  no-import-assign
+   80:30  error  'jest' is not defined                  no-undef
+   81:5   error  The members of 'socket' are read-only  no-import-assign
+   81:17  error  'jest' is not defined                  no-undef
+   82:5   error  The members of 'socket' are read-only  no-import-assign
+   82:18  error  'jest' is not defined                  no-undef
+  133:22  error  'jest' is not defined                  no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\mentorship\mentorshipAPI.js
+   3:18  error  'process' is not defined                  no-undef
+  37:16  error  'refreshError' is defined but never used  no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\mentorship\socket.js
+  3:26  error  'process' is not defined  no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\moderation\AppealSystem.jsx
+    1:27  error  'useEffect' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                   no-unused-vars
+   35:14  error  'error' is defined but never used                                                                  no-unused-vars
+  313:10  error  'selectedAppeal' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u     no-unused-vars
+  313:26  error  'setSelectedAppeal' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  322:31  error  'newAppeal' is defined but never used                                                              no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\moderation\ModerationAnalytics.jsx
+   8:10  error    'selectedMetric' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                     no-unused-vars
+   8:26  error    'setSelectedMetric' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                  no-unused-vars
+  12:6   warning  React Hook useEffect has a missing dependency: 'fetchAnalytics'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  75:33  error    'type' is assigned a value but never used                                                                          no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\moderation\ModerationCaseDetail.jsx
+  24:6  warning  React Hook useEffect has a missing dependency: 'fetchCaseDetails'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\moderation\ModerationDashboard.jsx
+  25:6   warning  React Hook useEffect has a missing dependency: 'fetchReports'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  44:64  error    '_' is defined but never used                                                                                    no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\moderation\ReportCard.jsx
+  1:27  error  'useEffect' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\moderation\ReportSystem.jsx
+   20:10  error    'comments' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                         no-unused-vars
+   20:20  error    'setComments' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                      no-unused-vars
+   76:14  error    'error' is defined but never used                                                                                no-unused-vars
+  335:6   warning  React Hook useEffect has a missing dependency: 'fetchReports'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\moderation\TrustScoreSystem.jsx
+   12:6   warning  React Hook useEffect has a missing dependency: 'fetchTrustScore'. Either include it or remove the dependency array   react-hooks/exhaustive-deps
+   23:14  error    'error' is defined but never used                                                                                    no-unused-vars
+  165:6   warning  React Hook useEffect has a missing dependency: 'fetchTrustScore'. Either include it or remove the dependency array   react-hooks/exhaustive-deps
+  338:6   warning  React Hook useEffect has a missing dependency: 'fetchLeaderboard'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\moderation\index.js
+  20:3  error  'ModerationDashboard' is not defined    no-undef
+  21:3  error  'ModerationCaseDetail' is not defined   no-undef
+  22:3  error  'ModerationAnalytics' is not defined    no-undef
+  25:3  error  'ReportForm' is not defined             no-undef
+  26:3  error  'ReportsList' is not defined            no-undef
+  27:3  error  'ReportCard' is not defined             no-undef
+  30:3  error  'AppealForm' is not defined             no-undef
+  31:3  error  'AppealStatusTracker' is not defined    no-undef
+  32:3  error  'AppealsList' is not defined            no-undef
+  35:3  error  'TrustScoreDisplay' is not defined      no-undef
+  36:3  error  'TrustScoreAdmin' is not defined        no-undef
+  37:3  error  'TrustScoreLeaderboard' is not defined  no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\notifications\NotificationCenter.jsx
+  138:7  error  Parsing error: Unexpected token setUnreadCount
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\notifications\__tests__\NotificationCenter.test.jsx
+    8:1   error  'jest' is not defined    no-undef
+    9:1   error  'jest' is not defined    no-undef
+   12:1   error  'jest' is not defined    no-undef
+   77:5   error  'jest' is not defined    no-undef
+   87:17  error  'jest' is not defined    no-undef
+   88:18  error  'jest' is not defined    no-undef
+   89:19  error  'jest' is not defined    no-undef
+  304:5   error  'global' is not defined  no-undef
+  304:27  error  'jest' is not defined    no-undef
+  305:14  error  'jest' is not defined    no-undef
+  306:16  error  'jest' is not defined    no-undef
+  308:5   error  'global' is not defined  no-undef
+  308:45  error  'jest' is not defined    no-undef
+  331:12  error  'global' is not defined  no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\profile\FollowButton.jsx
+   9:10  error    'error' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                  no-unused-vars
+  27:6   warning  React Hook useEffect has a missing dependency: 'handleFollowUpdate'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\profile\__tests__\FollowButton.test.jsx
+    9:1   error  'jest' is not defined  no-undef
+   10:1   error  'jest' is not defined  no-undef
+   13:1   error  'jest' is not defined  no-undef
+   22:24  error  'jest' is not defined  no-undef
+   25:5   error  'jest' is not defined  no-undef
+   27:17  error  'jest' is not defined  no-undef
+   28:18  error  'jest' is not defined  no-undef
+  185:24  error  'jest' is not defined  no-undef
+  188:5   error  'jest' is not defined  no-undef
+  257:24  error  'jest' is not defined  no-undef
+  260:5   error  'jest' is not defined  no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\recommendations\RecommendationCards.jsx
+   36:10  error    'dismissed' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                 no-unused-vars
+   44:6   warning  React Hook useEffect has a missing dependency: 'fetchRecommendations'. Either include it or remove the dependency array                   react-hooks/exhaustive-deps
+   44:20  warning  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+   61:6   warning  React Hook useEffect has a missing dependency: 'handleRecommendationUpdate'. Either include it or remove the dependency array             react-hooks/exhaustive-deps
+  149:9   error    'openFeedbackModal' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                         no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\recommendations\RecommendedMentors.jsx
+   42:6   warning  React Hook useEffect has a missing dependency: 'fetchMentors'. Either include it or remove the dependency array                           react-hooks/exhaustive-deps
+   42:14  warning  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+  142:9   error    'getRatingColor' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                            no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\recommendations\RecommendedPosts.jsx
+  45:6   warning  React Hook useEffect has a missing dependency: 'fetchPosts'. Either include it or remove the dependency array                             react-hooks/exhaustive-deps
+  45:14  warning  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\recommendations\RecommendedSessions.jsx
+   47:6   warning  React Hook useEffect has a missing dependency: 'fetchSessions'. Either include it or remove the dependency array                          react-hooks/exhaustive-deps
+   47:14  warning  React Hook useEffect has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+  135:9   error    'formatNumber' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                              no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\recommendations\__tests__\RecommendationCards.test.jsx
+    8:1   error  'jest' is not defined     no-undef
+    9:1   error  'jest' is not defined     no-undef
+   11:12  error  'jest' is not defined     no-undef
+   12:7   error  'jest' is not defined     no-undef
+   13:8   error  'jest' is not defined     no-undef
+   17:1   error  'jest' is not defined     no-undef
+   38:1   error  'jest' is not defined     no-undef
+   39:6   error  'jest' is not defined     no-undef
+  145:5   error  'jest' is not defined     no-undef
+  554:26  error  'require' is not defined  no-undef
+  562:26  error  'require' is not defined  no-undef
+  572:26  error  'require' is not defined  no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\search\RecommendedMentors.jsx
+  26:6  warning  React Hook useEffect has a missing dependency: 'fetchRecommendedMentors'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\search\SearchBar.jsx
+  31:35  warning  React Hook useCallback received a function whose dependencies are unknown. Pass an inline function instead  react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\search\SearchResults.jsx
+   24:17  error    'setQuery' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                          no-unused-vars
+  125:6   warning  React Hook useEffect has a missing dependency: 'performSearch'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  444:36  error    'index' is defined but never used                                                                                 no-unused-vars
+  456:34  error    'index' is defined but never used                                                                                 no-unused-vars
+  503:39  error    'Icon' is defined but never used                                                                                  no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\search\TrendingPosts.jsx
+  26:6  warning  React Hook useEffect has a missing dependency: 'fetchTrendingPosts'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\search\__tests__\SearchBar.test.jsx
+    8:1   error  'jest' is not defined  no-undef
+   11:1   error  'jest' is not defined  no-undef
+   29:5   error  'jest' is not defined  no-undef
+   34:18  error  'jest' is not defined  no-undef
+   35:18  error  'jest' is not defined  no-undef
+   36:21  error  'jest' is not defined  no-undef
+   99:26  error  'jest' is not defined  no-undef
+  116:26  error  'jest' is not defined  no-undef
+  144:18  error  'jest' is not defined  no-undef
+  145:18  error  'jest' is not defined  no-undef
+  146:21  error  'jest' is not defined  no-undef
+  166:18  error  'jest' is not defined  no-undef
+  167:18  error  'jest' is not defined  no-undef
+  168:21  error  'jest' is not defined  no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\search\__tests__\TrendingPosts.test.jsx
+   8:1  error  'jest' is not defined  no-undef
+  11:1  error  'jest' is not defined  no-undef
+  73:5  error  'jest' is not defined  no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\workflow\TaskScheduler.jsx
+   78:6   warning  React Hook useEffect has missing dependencies: 'fetchScheduledTasks' and 'fetchTasks'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  177:9   error    'handleCreateScheduledTask' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                  no-unused-vars
+  645:30  error    'err' is defined but never used                                                                                                            no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\workflow\WorkflowDashboard.jsx
+   14:10  error    'filterStatus' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                     no-unused-vars
+   14:24  error    'setFilterStatus' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                  no-unused-vars
+   51:6   warning  React Hook useEffect has a missing dependency: 'fetchData'. Either include it or remove the dependency array                                                                                                                                                                                     react-hooks/exhaustive-deps
+   82:6   warning  React Hook useEffect has missing dependencies: 'handleTaskCompleted', 'handleTaskFailed', 'handleTaskStarted', 'handleWorkflowCompleted', 'handleWorkflowCreated', 'handleWorkflowDeleted', 'handleWorkflowFailed', and 'handleWorkflowLog'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+  241:9   error    'getStatusColor' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                   no-unused-vars
+  272:9   error    'formatDuration' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                                                                                                                                                                                                   no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\components\workflow\__tests__tests__TaskScheduler.test.jsx
+  150:57  error  Parsing error: Unexpected token )
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\context\AuthContext.jsx
+   9:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  35:18  error  'error' is defined but never used                                                                                               no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\context\SocketProvider.jsx
+  65:17  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\pages\BookmarksPage.jsx
+   25:10  error    'error' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                              no-unused-vars
+   36:6   warning  React Hook useEffect has a missing dependency: 'fetchBookmarks'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  126:9   error    'handleSelectAll' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u                    no-unused-vars
+  348:49  error    'index' is defined but never used                                                                                  no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\pages\FeedNew-Refactored.jsx
+  16:32  error  'toggleTag' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u   no-unused-vars
+  16:43  error  'updateSort' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\pages\PostDetail.jsx
+  178:6  warning  React Hook useEffect has missing dependencies: 'fetchComments' and 'fetchPost'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\pages\Profile.jsx
+  241:17  error  'currentUser' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  247:9   error  'navigate' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u     no-unused-vars
+  329:16  error  'current' is not defined                                                                     no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\pages\ProfilePage.jsx
+  82:6  warning  React Hook useEffect has missing dependencies: 'handleBookmarkUpdate', 'handleFollowUpdate', and 'handleProfileUpdate'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\pages\UserProfile.jsx
+  145:6  warning  React Hook useEffect has missing dependencies: 'fetchPosts' and 'fetchUser'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\services\ai.analytics.api.js
+   38:48  error  'BASE_URL' is not defined  no-undef
+  508:18  error  'require' is not defined   no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\services\analyticsAPI.js
+  38:16  error  'refreshError' is defined but never used  no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\services\api.js
+  42:20  error  'refreshError' is defined but never used  no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\services\gamificationAPI.js
+   38:16  error  'refreshError' is defined but never used                                                        no-unused-vars
+   53:13  error  'currentUserId' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u   no-unused-vars
+   83:13  error  'currentUserId' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u   no-unused-vars
+  111:13  error  'currentUserId' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u   no-unused-vars
+  152:13  error  'currentUserId' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u   no-unused-vars
+  190:13  error  'currentUserId' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u   no-unused-vars
+  202:13  error  'currentUserId' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u   no-unused-vars
+  217:13  error  'currentUserId' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u   no-unused-vars
+  232:13  error  'currentUserId' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u   no-unused-vars
+  382:13  error  'currentUserId' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u   no-unused-vars
+  405:13  error  'currentUserId' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u   no-unused-vars
+  445:13  error  'currentUserId' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u   no-unused-vars
+  690:11  error  'currentLevelXP' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\services\learningPaths.api.js
+   38:48  error  'BASE_URL' is not defined                 no-undef
+  558:35  error  'userProgress' is defined but never used  no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\services\notificationAPI.js
+  38:16  error  'refreshError' is defined but never used  no-unused-vars
+  70:48  error  'userId' is defined but never used        no-unused-vars
+  76:36  error  'userId' is defined but never used        no-unused-vars
+  82:44  error  'userId' is defined but never used        no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\services\recommendationAPI.js
+  93:58  error  Parsing error: Unexpected token =>
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\services\searchAPI.js
+  38:16  error  'refreshError' is defined but never used  no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\services\sessionService.js
+  21:29  error  'userId' is defined but never used  no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\services\skillGap.socket.service.js
+  312:7   error  'skillGapSocketService' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  312:35  error  'SkillGapService' is not defined                                                                       no-undef
+  314:16  error  'skillGapServiceService' is not defined                                                                no-undef
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\services\workflowAPI.js
+   38:16  error  'refreshError' is defined but never used  no-unused-vars
+   96:26  error  'userId' is defined but never used        no-unused-vars
+  465:20  error  'e' is defined but never used             no-unused-vars
+  500:16  error  'e' is defined but never used             no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\socket.js
+  3:10  error  'authSyncManager' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\test\auth-mock.test.tsx
+  7:13  error  Parsing error: Unexpected token {
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\test\auth-simple.test.tsx
+  7:13  error  Parsing error: Unexpected token {
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\test\post-creation.test.tsx
+  5:13  error  Parsing error: Unexpected token {
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\test\protected-route-basic.test.tsx
+  8:46  error  Parsing error: Unexpected token :
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\test\protected-route-final.test.tsx
+  17:35  error  Parsing error: Cannot use keyword 'await' outside an async function
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\test\protected-route-mocked.test.tsx
+  17:14  error  Parsing error: Unexpected token <
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\test\protected-route-simple.test.tsx
+  21:10  error  Parsing error: Unexpected token <
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\test\protected-route-working-final.test.tsx
+  18:14  error  Parsing error: Unexpected token <
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\test\protected-route-working.test.tsx
+  10:30  error  Parsing error: Unexpected token :
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\test\protected-route.test.tsx
+  6:13  error  Parsing error: Unexpected token {
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\test\setup.ts
+  33:16  error  Parsing error: Unexpected token :
+
+C:\Users\vikas nallani\Downloads\java\Knowledge_Sharing_Tech_Community\knowledge-sharing-community\frontend\src\utils\productionStressTest.js
+   99:11  error  'initialConnected' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  176:14  error  'error' is defined but never used                                                                 no-unused-vars
+
+Γ£û 543 problems (497 errors, 46 warnings)
+

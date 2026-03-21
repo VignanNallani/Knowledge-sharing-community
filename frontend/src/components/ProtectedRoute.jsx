@@ -1,48 +1,27 @@
-
-
-// import { Navigate } from "react-router-dom";
-// import { useAuth } from "../context/AuthContext";
-
-// export default function ProtectedRoute({ children, role }) {
-//   const { isAuthenticated, role: userRole } = useAuth();
-
-//   if (!isAuthenticated) {
-//     return <Navigate to="/signin" replace />;
-//   }
-
-//   if (role && userRole !== role) {
-//     return <Navigate to="/" replace />;
-//   }
-
-//   return children;
-// }
-
-
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-export default function ProtectedRoute({ role, children }) {
-  const { user, loading } = useAuth();
+export default function ProtectedRoute({ children, role }) {
+  const { isAuthenticated, role: userRole, loading } = useAuth();
 
-  // ⏳ WAIT for auth to resolve
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center text-slate-500">
-        Loading...
+      <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-2 border-[var(--accent-blue)] border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p className="text-[var(--text-secondary)]">Loading...</p>
+        </div>
       </div>
-    );
+    )
   }
 
-  // 🔐 Not logged in
-  if (!user) {
-    return <Navigate to="/signin" replace />;
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
   }
 
-  // 🛡️ Role-based access
-  if (role && user.role !== role) {
+  if (role && userRole !== role) {
     return <Navigate to="/community" replace />;
   }
 
-  // ✅ IMPORTANT: render layout outlet
-  return children ? children : <Outlet />;
+  return children;
 }

@@ -1,0 +1,427 @@
+# System Flow Diagrams - Knowledge Sharing Tech Community
+
+## Overview
+This document contains Mermaid flow diagrams for all major system flows in the Knowledge Sharing Tech Community platform.
+
+---
+
+## 1. Authentication Flow
+
+```mermaid
+flowchart TD
+    A[User Login Request] --> B{Authentication Method}
+    B -->|Email/Password| C[Validate Credentials]
+    B -->|OAuth Provider| D[OAuth Redirect]
+    B -->|SSO| E[Enterprise SSO]
+    
+    C --> F{Credentials Valid?}
+    D --> G[OAuth Token Exchange]
+    E --> H[SSO Validation]
+    
+    F -->|No| I[Return Error]
+    F -->|Yes| J[Generate JWT Token]
+    G --> K{OAuth Success?}
+    H --> L{SSO Valid?}
+    
+    K -->|No| I
+    K -->|Yes| J
+    L -->|No| I
+    L -->|Yes| J
+    
+    J --> M[Update Last Login]
+    M --> N[Check Trust Score]
+    N --> O{Trust Score > Threshold?}
+    O -->|No| P[Restricted Access]
+    O -->|Yes| Q[Full Access]
+    
+    P --> R[Return Limited Token]
+    Q --> S[Return Full Token]
+    I --> T[Login Failed Response]
+    R --> U[Redirect to Dashboard]
+    S --> U
+    T --> V[Redirect to Login]
+```
+
+---
+
+## 2. Content Flow
+
+```mermaid
+flowchart TD
+    A[User Creates Content] --> B[Content Validation]
+    B --> C{Validation Passed?}
+    C -->|No| D[Return Validation Errors]
+    C -->|Yes| E[Check Trust Score]
+    
+    E --> F{Trust Score Sufficient?}
+    F -->|No| G[Queue for Review]
+    F -->|Yes| H[Auto-Approve]
+    
+    G --> I[Moderator Review]
+    I --> J{Moderator Decision}
+    J -->|Approve| K[Publish Content]
+    J -->|Reject| L[Notify Rejection]
+    J -->|Request Changes| M[Return for Revision]
+    
+    H --> K
+    K --> N[Update Trust Score]
+    N --> O[Notify Followers]
+    O --> P[Update Search Index]
+    P --> Q[Log Activity]
+    
+    L --> R[Update Trust Score]
+    M --> S[Notify User]
+    Q --> T[Content Published]
+    S --> U[User Revises Content]
+    U --> B
+```
+
+---
+
+## 3. Report Flow
+
+```mermaid
+flowchart TD
+    A[User Reports Content/User] --> B[Report Validation]
+    B --> C{Valid Report?}
+    C -->|No| D[Reject Report]
+    C -->|Yes| E[Categorize Report Type]
+    
+    E --> F{Report Category}
+    F -->|Spam| G[Low Priority Queue]
+    F -->|Harassment| H[High Priority Queue]
+    F -->|Quality| I[Medium Priority Queue]
+    F -->|Security| J[Urgent Priority Queue]
+    
+    G --> K[Auto-Review Possible]
+    H --> L[Immediate Human Review]
+    I --> M[Standard Review Process]
+    J --> N[Emergency Review]
+    
+    K --> O{Auto-Action Possible?}
+    O -->|Yes| P[Apply Auto-Action]
+    O -->|No| Q[Assign Moderator]
+    
+    L --> R[Assign Senior Moderator]
+    M --> Q
+    N --> S[Assign Safety Team]
+    
+    P --> T[Notify Reporter]
+    Q --> U[Moderator Investigation]
+    R --> U
+    S --> U
+    
+    U --> V{Investigation Result}
+    V -->|No Action| W[Close Report]
+    V -->|Warning| X[Issue Warning]
+    V -->|Content Removal| Y[Remove Content]
+    V -->|Account Action| Z[Apply Account Penalty]
+    
+    W --> AA[Update Trust Scores]
+    X --> AA
+    Y --> AA
+    Z --> AA
+    
+    AA --> BB[Notify All Parties]
+    BB --> CC[Log for Pattern Analysis]
+```
+
+---
+
+## 4. Moderation Flow
+
+```mermaid
+flowchart TD
+    A[Report Received] --> B[Triage Assessment]
+    B --> C{Severity Level}
+    C -->|Low| D[Queue for Standard Review]
+    C -->|Medium| E[Queue for Priority Review]
+    C -->|High| F[Queue for Urgent Review]
+    C -->|Critical| G[Immediate Action Required]
+    
+    D --> H[Assign Available Moderator]
+    E --> I[Assign Senior Moderator]
+    F --> J[Assign Safety Team Lead]
+    G --> K[Emergency Protocol]
+    
+    H --> L[Moderator Investigation]
+    I --> M[Senior Investigation]
+    J --> N[Safety Investigation]
+    K --> O[Immediate Content Removal]
+    
+    L --> P{Decision Required}
+    M --> P
+    N --> P
+    O --> Q[Notify Safety Team]
+    
+    P -->|No Action| R[Dismiss Report]
+    P -->|Warning| S[Issue Formal Warning]
+    P -->|Content Action| T[Content Removal/Edit]
+    P -->|Account Action| U[Account Suspension/Ban]
+    
+    R --> V[Update Trust Score]
+    S --> V
+    T --> V
+    U --> V
+    
+    V --> W[Notify User]
+    W --> X[Notify Reporter]
+    X --> Y{User Appeals?}
+    Y -->|No| Z[Close Case]
+    Y -->|Yes| AA[Initiate Appeal Process]
+    
+    Q --> BB[Full Investigation]
+    BB --> P
+    AA --> CC[Assign Different Moderator]
+    CC --> DD[Appeal Review]
+    DD --> EE{Appeal Decision}
+    EE -->|Uphold| Z
+    EE -->|Reverse| FF[Reverse Action]
+    FF --> V
+```
+
+---
+
+## 5. Trust Scoring Flow
+
+```mermaid
+flowchart TD
+    A[User Action] --> B[Action Classification]
+    B --> C{Action Type}
+    C -->|Positive| D[Calculate Positive Impact]
+    C -->|Negative| E[Calculate Negative Impact]
+    C -->|Neutral| F[No Score Change]
+    
+    D --> G[Quality Assessment]
+    E --> H[Severity Assessment]
+    F --> I[Update Activity Log]
+    
+    G --> J{Quality Score}
+    J -->|High| K[Large Score Increase]
+    J -->|Medium| L[Medium Score Increase]
+    J -->|Low| M[Small Score Increase]
+    
+    H --> N{Severity Level}
+    N -->|Low| O[Small Score Decrease]
+    N -->|Medium| P[Medium Score Decrease]
+    N -->|High| Q[Large Score Decrease]
+    N -->|Critical| R[Major Score Decrease]
+    
+    K --> S[Apply Score Change]
+    L --> S
+    M --> S
+    O --> S
+    P --> S
+    Q --> S
+    R --> S
+    
+    S --> T[Update Trust Score]
+    T --> U{Trust Score Threshold Check}
+    U -->|Below Warning| V[Apply Restrictions]
+    U -->|Below Critical| W[Apply Severe Restrictions]
+    U -->|Above Recovery| X[Restore Privileges]
+    U -->|Normal Range| Y[Maintain Current Status]
+    
+    V --> Z[Notify User]
+    W --> Z
+    X --> Z
+    Y --> AA[Continue Normal Operation]
+    
+    Z --> BB[Log Trust Score Change]
+    I --> BB
+    BB --> CC[Update User Status]
+```
+
+---
+
+## 6. Escalation Flow
+
+```mermaid
+flowchart TD
+    A[Issue Identified] --> B{Initial Assessment}
+    B -->|Routine| C[Standard Process]
+    B -->|Complex| D[Escalation Trigger]
+    B -->|Urgent| E[Immediate Escalation]
+    
+    C --> F[Resolve at Current Level]
+    D --> G[Escalation Criteria Check]
+    E --> H[Emergency Escalation]
+    
+    G --> I{Escalation Level}
+    I -->|Level 1| J[Senior Moderator]
+    I -->|Level 2| K[Moderation Lead]
+    I -->|Level 3| L[Community Manager]
+    I -->|Level 4| M[Trust & Safety Team]
+    
+    H --> N[Assign Safety Team Lead]
+    J --> O[Senior Review]
+    K --> P[Lead Review]
+    L --> Q[Manager Review]
+    M --> R[Team Review]
+    N --> S[Urgent Safety Review]
+    
+    O --> T{Resolution Possible?}
+    P --> T
+    Q --> T
+    R --> T
+    S --> U{Immediate Action Required?}
+    
+    T -->|Yes| V[Implement Solution]
+    T -->|No| W[Further Escalation]
+    U -->|Yes| X[Emergency Action]
+    U -->|No| Y[Standard Safety Process]
+    
+    V --> Z[Document Resolution]
+    W --> AA[Next Level Escalation]
+    X --> BB[Document Emergency Action]
+    Y --> CC[Standard Resolution]
+    
+    Z --> DD[Notify Stakeholders]
+    AA --> I
+    BB --> DD
+    CC --> DD
+    
+    DD --> EE[Update Escalation Log]
+    EE --> FF[Review Process Improvement]
+```
+
+---
+
+## 7. Appeal Flow
+
+```mermaid
+flowchart TD
+    A[User Receives Decision] --> B{Appeal Eligible?}
+    B -->|No| C[Decision Final]
+    B -->|Yes| D[Appeal Initiation]
+    
+    D --> E[Appeal Form Submission]
+    E --> F[Appeal Validation]
+    F --> G{Valid Appeal?}
+    G -->|No| H[Reject Appeal]
+    G -->|Yes| I[Assign Appeal Reviewer]
+    
+    I --> J{Original Reviewer Available?}
+    J -->|Yes| K[Assign Different Reviewer]
+    J -->|No| L[Assign Senior Reviewer]
+    
+    K --> M[Fresh Evidence Review]
+    L --> M
+    M --> N[Context Analysis]
+    N --> O[Policy Re-evaluation]
+    
+    O --> P{Appeal Decision}
+    P -->|Uphold Original| Q[Confirm Original Decision]
+    P -->|Modify| R[Modify Original Decision]
+    P -->|Reverse| S[Reverse Original Decision]
+    
+    Q --> T[Notify User of Upheld Decision]
+    R --> U[Implement Modified Action]
+    S --> V[Reverse Original Action]
+    
+    U --> W[Notify User of Modification]
+    V --> X[Notify User of Reversal]
+    T --> Y[Log Appeal Outcome]
+    W --> Y
+    X --> Y
+    
+    Y --> Z{Further Appeal Possible?}
+    Z -->|No| AA[Appeal Process Complete]
+    Z -->|Yes| BB[Final Appeal Level]
+    
+    BB --> CC[Executive Review]
+    CC --> DD[Final Decision]
+    DD --> EE[Implement Final Decision]
+    EE --> AA
+```
+
+---
+
+## 8. Admin Flow
+
+```mermaid
+flowchart TD
+    A[Admin Login] --> B{Multi-Factor Auth?}
+    B -->|No| C[Require MFA Setup]
+    B -->|Yes| D[Admin Dashboard]
+    
+    C --> E[MFA Registration]
+    E --> F[Admin Access Granted]
+    F --> D
+    
+    D --> G{Admin Action Type}
+    G -->|User Management| H[User Admin Panel]
+    G -->|Content Management| I[Content Admin Panel]
+    G -->|System Configuration| J[System Settings]
+    G -->|Analytics| K[Analytics Dashboard]
+    G -->|Safety| L[Safety Dashboard]
+    
+    H --> M{User Action}
+    M -->|View| N[User Details]
+    M -->|Edit| O[Edit User Profile]
+    M -->|Suspend| P[Account Suspension]
+    M -->|Delete| Q[Account Deletion]
+    
+    I --> R{Content Action}
+    R -->|Review| S[Content Review Queue]
+    R -->|Remove| T[Content Removal]
+    R -->|Feature| U[Content Promotion]
+    
+    J --> V{System Action}
+    V -->|Configuration| W[Update Settings]
+    V -->|Maintenance| X[System Maintenance]
+    V -->|Backup| Y[Data Backup]
+    
+    K --> Z[Generate Reports]
+    L --> AA[Safety Incidents]
+    
+    N --> BB[Log Admin Action]
+    O --> BB
+    P --> BB
+    Q --> BB
+    S --> BB
+    T --> BB
+    U --> BB
+    W --> BB
+    X --> BB
+    Y --> BB
+    Z --> BB
+    AA --> BB
+    
+    BB --> CC{High-Risk Action?}
+    CC -->|Yes| DD[Require Secondary Approval]
+    CC -->|No| EE[Action Complete]
+    
+    DD --> FF[Second Admin Review]
+    FF --> GG{Approval Granted?}
+    GG -->|Yes| EE
+    GG -->|No| HH[Action Rejected]
+    
+    EE --> II[Notify Affected Users]
+    HH --> II
+    II --> JJ[Update Audit Log]
+```
+
+---
+
+## Flow Integration Points
+
+### Cross-Flow Dependencies
+- **Trust Score**: Affects all flows, updated by multiple systems
+- **User Status**: Impacts access across all flows
+- **Audit Trail**: Connected to all administrative and moderation actions
+- **Notifications**: Integrated across all user-facing flows
+
+### System Health Monitoring
+- **Flow Performance**: Monitored for bottlenecks and failures
+- **Decision Quality**: Tracked for consistency and fairness
+- **User Satisfaction**: Measured at key flow completion points
+- **System Load**: Balanced across concurrent flows
+
+### Scaling Considerations
+- **Queue Management**: Dynamic prioritization based on system load
+- **Load Balancing**: Distribute flow processing across available resources
+- **Circuit Breakers**: Prevent cascade failures in interconnected flows
+- **Retry Logic**: Handle temporary failures in flow execution
+
+These flow diagrams provide the foundation for understanding system behavior, identifying optimization opportunities, and ensuring consistent user experiences across the Knowledge Sharing Tech Community platform.

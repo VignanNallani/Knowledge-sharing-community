@@ -1,0 +1,278 @@
+// Grafana Dashboard JSON - Production Observability Dashboard
+{
+  "dashboard": {
+    "id": null,
+    "title": "Production System Observability",
+    "tags": ["production", "resilience", "backend"],
+    "timezone": "browser",
+    "panels": [
+      {
+        "id": 1,
+        "title": "Request Latency (p50/p95/p99)",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))",
+            "legendFormat": "p50"
+          },
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))",
+            "legendFormat": "p95"
+          },
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))",
+            "legendFormat": "p99"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Seconds",
+            "min": 0
+          }
+        ],
+        "gridPos": {"x": 0, "y": 0, "w": 12, "h": 8}
+      },
+      {
+        "id": 2,
+        "title": "Error Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total{status_code=~\"4..|5..\"}[5m])) / sum(rate(http_requests_total[5m]))",
+            "legendFormat": "Error Rate"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Percentage",
+            "min": 0,
+            "max": 1
+          }
+        ],
+        "gridPos": {"x": 12, "y": 0, "w": 12, "h": 8}
+      },
+      {
+        "id": 3,
+        "title": "Request Rate",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(http_requests_total[5m])) by (method)",
+            "legendFormat": "{{method}}"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Requests/sec"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 8, "w": 12, "h": 8}
+      },
+      {
+        "id": 4,
+        "title": "Database Query Duration",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, sum(rate(db_query_duration_seconds_bucket[5m])) by (le, operation_type))",
+            "legendFormat": "p95 {{operation_type}}"
+          },
+          {
+            "expr": "histogram_quantile(0.99, sum(rate(db_query_duration_seconds_bucket[5m])) by (le, operation_type))",
+            "legendFormat": "p99 {{operation_type}}"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Seconds",
+            "min": 0
+          }
+        ],
+        "gridPos": {"x": 12, "y": 8, "w": 12, "h": 8}
+      },
+      {
+        "id": 5,
+        "title": "Database Pool Saturation",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "db_pool_active",
+            "legendFormat": "Active"
+          },
+          {
+            "expr": "db_pool_idle",
+            "legendFormat": "Idle"
+          },
+          {
+            "expr": "db_pool_total",
+            "legendFormat": "Total"
+          },
+          {
+            "expr": "db_pool_wait_count",
+            "legendFormat": "Waiting"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Connections"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 16, "w": 12, "h": 8}
+      },
+      {
+        "id": 6,
+        "title": "Redis Health",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "redis_up",
+            "legendFormat": "Redis Up"
+          },
+          {
+            "expr": "redis_latency_seconds",
+            "legendFormat": "Redis Latency"
+          },
+          {
+            "expr": "rate(rate_limit_fallback_total[5m])",
+            "legendFormat": "Fallback Rate"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Value"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 16, "w": 12, "h": 8}
+      },
+      {
+        "id": 7,
+        "title": "Concurrency Guard",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "concurrency_active_requests",
+            "legendFormat": "Active Requests"
+          },
+          {
+            "expr": "rate(concurrency_rejected_total[5m]) by (reason)",
+            "legendFormat": "Rejections/sec ({{reason}})"
+          },
+          {
+            "expr": "concurrency_queue_depth",
+            "legendFormat": "Queue Depth"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Count"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 24, "w": 12, "h": 8}
+      },
+      {
+        "id": 8,
+        "title": "Circuit Breaker State",
+        "type": "singlestat",
+        "targets": [
+          {
+            "expr": "circuit_breaker_state",
+            "legendFormat": "State"
+          }
+        ],
+        "valueMaps": [
+          {"value": "0", "text": "CLOSED"},
+          {"value": "1", "text": "OPEN"},
+          {"value": "2", "text": "HALF-OPEN"}
+        ],
+        "thresholds": "0,1,2",
+        "gridPos": {"x": 12, "y": 24, "w": 6, "h": 8}
+      },
+      {
+        "id": 9,
+        "title": "Load Shedding Stage",
+        "type": "singlestat",
+        "targets": [
+          {
+            "expr": "load_shedding_stage",
+            "legendFormat": "Stage"
+          }
+        ],
+        "valueMaps": [
+          {"value": "0", "text": "NORMAL"},
+          {"value": "1", "text": "WARNING"},
+          {"value": "2", "text": "LOAD_SHED"},
+          {"value": "3", "text": "CRITICAL"},
+          {"value": "4", "text": "EMERGENCY"}
+        ],
+        "thresholds": "0,1,2,3,4",
+        "gridPos": {"x": 18, "y": 24, "w": 6, "h": 8}
+      },
+      {
+        "id": 10,
+        "title": "Memory Usage",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "process_resident_memory_bytes / 1024 / 1024",
+            "legendFormat": "RSS (MB)"
+          },
+          {
+            "expr": "process_heap_used_bytes / 1024 / 1024",
+            "legendFormat": "Heap Used (MB)"
+          },
+          {
+            "expr": "process_heap_total_bytes / 1024 / 1024",
+            "legendFormat": "Heap Total (MB)"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "MB"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 32, "w": 12, "h": 8}
+      },
+      {
+        "id": 11,
+        "title": "Event Loop Lag",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "event_loop_lag_seconds * 1000",
+            "legendFormat": "Event Loop Lag (ms)"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Milliseconds"
+          }
+        ],
+        "gridPos": {"x": 12, "y": 32, "w": 12, "h": 8}
+      },
+      {
+        "id": 12,
+        "title": "Business Operations",
+        "type": "graph",
+        "targets": [
+          {
+            "expr": "sum(rate(business_operations_total[5m])) by (operation, status)",
+            "legendFormat": "{{operation}} - {{status}}"
+          }
+        ],
+        "yAxes": [
+          {
+            "label": "Operations/sec"
+          }
+        ],
+        "gridPos": {"x": 0, "y": 40, "w": 24, "h": 8}
+      }
+    ],
+    "time": {
+      "from": "now-1h",
+      "to": "now"
+    },
+    "refresh": "5s",
+    "schemaVersion": 27,
+    "version": 1
+  }
+}

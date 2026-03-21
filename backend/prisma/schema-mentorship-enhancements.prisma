@@ -1,0 +1,110 @@
+// Enhanced schema for mentorship features
+// Add these models to your existing schema.prisma
+
+model MentorshipSession {
+  id          String           @id @default(uuid())
+  mentorshipId Int
+  mentorId    Int
+  menteeId    Int
+  title       String
+  description String?
+  scheduledAt DateTime
+  duration    Int              // Duration in minutes
+  status      SessionStatus    @default(SCHEDULED)
+  meetUrl     String?
+  notes       String?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  
+  mentorship  Mentorship       @relation(fields: [mentorshipId], references: [id], onDelete: Cascade)
+  mentor      User             @relation("MentorSessions", fields: [mentorId], references: [id], onDelete: Cascade)
+  mentee      User             @relation("MenteeSessions", fields: [menteeId], references: [id], onDelete: Cascade)
+  feedback    SessionFeedback?
+  
+  @@index([mentorshipId])
+  @@index([mentorId])
+  @@index([menteeId])
+  @@index([status])
+  @@index([scheduledAt])
+  @@map("mentorship_sessions")
+}
+
+model SessionFeedback {
+  id          String     @id @default(uuid())
+  sessionId   String     @unique
+  mentorId    Int
+  menteeId    Int
+  rating      Int        // 1-5 stars
+  comment     String?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  
+  session     MentorshipSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  mentor      User         @relation("MentorFeedback", fields: [mentorId], references: [id], onDelete: Cascade)
+  mentee      User         @relation("MenteeFeedback", fields: [menteeId], references: [id], onDelete: Cascade)
+  
+  @@index([sessionId])
+  @@index([mentorId])
+  @@index([menteeId])
+  @@index([rating])
+  @@map("session_feedback")
+}
+
+model MentorAvailability {
+  id          String           @id @default(uuid())
+  mentorId    Int
+  dayOfWeek   Int              // 0-6 (Sunday-Saturday)
+  startTime   String           // HH:MM format
+  endTime     String           // HH:MM format
+  timezone    String           // IANA timezone identifier
+  isActive    Boolean          @default(true)
+  recurring   Boolean          @default(true)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  
+  mentor      User             @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+  
+  @@index([mentorId])
+  @@index([dayOfWeek])
+  @@index([isActive])
+  @@map("mentor_availability")
+}
+
+model SessionReminder {
+  id          String           @id @default(uuid())
+  sessionId   String
+  mentorId    Int
+  menteeId    Int
+  reminderType ReminderType    @default(SESSION_START)
+  scheduledAt DateTime
+  sentAt      DateTime?
+  status      ReminderStatus   @default(PENDING)
+  createdAt   DateTime         @default(now())
+  
+  @@index([sessionId])
+  @@index([mentorId])
+  @@index([menteeId])
+  @@index([scheduledAt])
+  @@index([status])
+  @@map("session_reminders")
+}
+
+enum SessionStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum ReminderType {
+  SESSION_START
+  SESSION_END
+  FEEDBACK_REQUEST
+}
+
+enum ReminderStatus {
+  PENDING
+  SENT
+  FAILED
+}

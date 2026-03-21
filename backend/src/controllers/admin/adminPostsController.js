@@ -1,208 +1,57 @@
-
-
-// import { PrismaClient, ActivityType } from "@prisma/client";
-// import { logActivity } from "../../services/activityService.js";
-
-// const prisma = new PrismaClient();
-
-// /* ================= PENDING POSTS ================= */
-// export const getPendingPosts = async (req, res) => {
-//   try {
-//     const posts = await prisma.post.findMany({
-//       where: { status: "PENDING" },
-//       include: {
-//         author: { select: { id: true, name: true } },
-//       },
-//       orderBy: { createdAt: "desc" },
-//     });
-
-//     res.json(posts);
-//   } catch (error) {
-//     console.error("GET PENDING POSTS ERROR:", error);
-//     res.status(500).json({ error: "Failed to fetch pending posts" });
-//   }
-// };
-
-// /* ================= APPROVE POST ================= */
-// export const approvePost = async (req, res) => {
-//   const postId = parseInt(req.params.id);
-
-//   try {
-//     const post = await prisma.post.update({
-//       where: { id: postId },
-//       data: { status: "APPROVED" },
-//       include: { author: true },
-//     });
-
-//     // Log activity for admin
-//     await logActivity({
-//       type: ActivityType.POST_APPROVED,
-//       message: `approved post "${post.title}"`,
-//       userId: req.user.id, // Admin
-//       entity: "POST",
-//       entityId: post.id,
-//     });
-
-//     // Log activity for post author
-//     await logActivity({
-//       type: ActivityType.POST_APPROVED,
-//       message: `your post "${post.title}" was approved by admin`,
-//       userId: post.authorId, // Author
-//       entity: "POST",
-//       entityId: post.id,
-//     });
-
-//     res.json({ message: "Post approved" });
-//   } catch (error) {
-//     console.error("APPROVE POST ERROR:", error);
-//     res.status(500).json({ error: "Failed to approve post" });
-//   }
-// };
-
-// /* ================= REJECT POST ================= */
-// export const rejectPost = async (req, res) => {
-//   const postId = parseInt(req.params.id);
-
-//   try {
-//     const post = await prisma.post.update({
-//       where: { id: postId },
-//       data: { status: "REJECTED" },
-//       include: { author: true },
-//     });
-
-//     // Log activity for admin
-//     await logActivity({
-//       type: ActivityType.POST_REJECTED,
-//       message: `rejected post "${post.title}"`,
-//       userId: req.user.id, // Admin
-//       entity: "POST",
-//       entityId: post.id,
-//     });
-
-//     // Log activity for post author
-//     await logActivity({
-//       type: ActivityType.POST_REJECTED,
-//       message: `your post "${post.title}" was rejected by admin`,
-//       userId: post.authorId, // Author
-//       entity: "POST",
-//       entityId: post.id,
-//     });
-
-//     res.json({ message: "Post rejected" });
-//   } catch (error) {
-//     console.error("REJECT POST ERROR:", error);
-//     res.status(500).json({ error: "Failed to reject post" });
-//   }
-// };
-
-
-import { PrismaClient, ActivityType } from "@prisma/client";
+import pkg from "@prisma/client";
+const { ActivityType } = pkg;
 import { logActivity } from "../../services/activityService.js";
+import ApiResponse from '../../utils/ApiResponse.js';
+import { ApiError } from '../../utils/ApiError.js';
+import prisma from '../../config/prisma.js';
+import asyncHandler from '../../middleware/asyncHandler.js';
 
-const prisma = new PrismaClient();
+import { paginate } from '../../utils/pagination.js';
 
 /* ================= PENDING POSTS ================= */
-export const getPendingPosts = async (req, res) => {
-  try {
-    const posts = await prisma.post.findMany({
+export const getPendingPosts = asyncHandler(async (req, res) => {
+  const { skip, limit, page } = paginate(req.query);
+  
+  const [posts, total] = await Promise.all([
+    prisma.post.findMany({
       where: { status: "PENDING" },
-      include: {
-        author: { select: { id: true, name: true } },
-      },
+      skip,
+      take: limit,
+      include: { author: { select: { id: true, name: true } } },
       orderBy: { createdAt: "desc" },
-    });
-
-    res.json(posts);
-  } catch (error) {
-    console.error("GET PENDING POSTS ERROR:", error);
-    res.status(500).json({ error: "Failed to fetch pending posts" });
-  }
-};
+    }),
+    prisma.post.count({ where: { status: "PENDING" } })
+  ]);
+  
+  return ApiResponse.success(res, { 
+    message: 'Pending posts fetched', 
+    data: { posts },
+    meta: { page, limit, total, totalPages: Math.ceil(total / limit) }
+  });
+});
 
 /* ================= APPROVE POST ================= */
-export const approvePost = async (req, res) => {
+export const approvePost = asyncHandler(async (req, res) => {
   const postId = parseInt(req.params.id);
+  const post = await prisma.post.update({ where: { id: postId }, data: { status: "APPROVED" }, include: { author: true } });
 
-  try {
-    const post = await prisma.post.update({
-      where: { id: postId },
-      data: { status: "APPROVED" },
-      include: { author: true },
-    });
+  await logActivity({ type: ActivityType.POST_APPROVED, message: `approved post "${post.title}"`, userId: req.user.id, entity: "POST", entityId: post.id });
+  await logActivity({ type: ActivityType.POST_APPROVED, message: `your post "${post.title}" was approved by admin`, userId: post.authorId, entity: "POST", entityId: post.id });
 
-    // Log activity for admin
-    await logActivity({
-      type: ActivityType.POST_APPROVED,
-      message: `approved post "${post.title}"`,
-      userId: req.user.id, // Admin
-      entity: "POST",
-      entityId: post.id,
-    });
-
-    // Log activity for post author
-    await logActivity({
-      type: ActivityType.POST_APPROVED,
-      message: `your post "${post.title}" was approved by admin`,
-      userId: post.authorId, // Author
-      entity: "POST",
-      entityId: post.id,
-    });
-
-    // ================= SOCKET.IO NOTIFICATION =================
-    const io = req.app.get("io");
-    io.to(`user-${post.authorId}`).emit("post-notification", {
-      message: `Your post "${post.title}" was approved`,
-      postId: post.id,
-      status: "APPROVED",
-    });
-
-    res.json({ message: "Post approved and author notified" });
-  } catch (error) {
-    console.error("APPROVE POST ERROR:", error);
-    res.status(500).json({ error: "Failed to approve post" });
-  }
-};
+  const io = req.app.get("io");
+  io.to(`user-${post.authorId}`).emit("post-notification", { message: `Your post "${post.title}" was approved`, postId: post.id, status: "APPROVED" });
+  return ApiResponse.success(res, { message: 'Post approved and author notified' });
+});
 
 /* ================= REJECT POST ================= */
-export const rejectPost = async (req, res) => {
+export const rejectPost = asyncHandler(async (req, res) => {
   const postId = parseInt(req.params.id);
+  const post = await prisma.post.update({ where: { id: postId }, data: { status: "REJECTED" }, include: { author: true } });
 
-  try {
-    const post = await prisma.post.update({
-      where: { id: postId },
-      data: { status: "REJECTED" },
-      include: { author: true },
-    });
+  await logActivity({ type: ActivityType.POST_REJECTED, message: `rejected post "${post.title}"`, userId: req.user.id, entity: "POST", entityId: post.id });
+  await logActivity({ type: ActivityType.POST_REJECTED, message: `your post "${post.title}" was rejected by admin`, userId: post.authorId, entity: "POST", entityId: post.id });
 
-    // Log activity for admin
-    await logActivity({
-      type: ActivityType.POST_REJECTED,
-      message: `rejected post "${post.title}"`,
-      userId: req.user.id, // Admin
-      entity: "POST",
-      entityId: post.id,
-    });
-
-    // Log activity for post author
-    await logActivity({
-      type: ActivityType.POST_REJECTED,
-      message: `your post "${post.title}" was rejected by admin`,
-      userId: post.authorId, // Author
-      entity: "POST",
-      entityId: post.id,
-    });
-
-    // ================= SOCKET.IO NOTIFICATION =================
-    const io = req.app.get("io");
-    io.to(`user-${post.authorId}`).emit("post-notification", {
-      message: `Your post "${post.title}" was rejected`,
-      postId: post.id,
-      status: "REJECTED",
-    });
-
-    res.json({ message: "Post rejected and author notified" });
-  } catch (error) {
-    console.error("REJECT POST ERROR:", error);
-    res.status(500).json({ error: "Failed to reject post" });
-  }
-};
+  const io = req.app.get("io");
+  io.to(`user-${post.authorId}`).emit("post-notification", { message: `Your post "${post.title}" was rejected`, postId: post.id, status: "REJECTED" });
+  return ApiResponse.success(res, { message: 'Post rejected and author notified' });
+});

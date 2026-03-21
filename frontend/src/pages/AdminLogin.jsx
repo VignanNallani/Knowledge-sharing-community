@@ -1,18 +1,20 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import api from '../api/axios'
+import { useAuth } from '../context/AuthContext';
 
 export default function AdminLogin(){
-  const [email,setEmail]=useState('')
-  const [password,setPassword]=useState('')
-  const [loading,setLoading]=useState(false)
-  const navigate = useNavigate()
+  const { login } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const submit = async (e) => {
     e.preventDefault()
     setLoading(true)
     try{
-      const res = await api.post('/api/auth/login', { email, password })
+    const res = await api.post('/auth/login', { email, password })
       const token = res.data.token || res.data.token
       const user = res.data.user || res.data.user
       if(!token) throw new Error('No token')
@@ -21,7 +23,9 @@ export default function AdminLogin(){
         setLoading(false)
         return
       }
-      localStorage.setItem('token', token)
+      
+      // Use AuthContext login for consistency
+      await login({ token });
       navigate('/admin/dashboard')
     }catch(err){
       alert('Login failed')

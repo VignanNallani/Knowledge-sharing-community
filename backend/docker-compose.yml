@@ -1,0 +1,70 @@
+services:
+  # API Service
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: knowledge-sharing-api:optimized
+    container_name: knowledge-sharing-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/knowledge_db?connection_limit=20&pool_timeout=10&connect_timeout=2&statement_timeout=2000
+      - JWT_SECRET=your-super-secret-jwt-key-change-in-production
+      - PORT=3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - knowledge-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # PostgreSQL Service
+  postgres:
+    image: postgres:15-alpine
+    container_name: knowledge-sharing-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: knowledge_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - knowledge-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d knowledge_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    command: >
+      postgres
+      -c shared_buffers=512MB
+      -c work_mem=16MB
+      -c effective_cache_size=2GB
+      -c max_connections=100
+      -c maintenance_work_mem=128MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+
+# Volumes
+volumes:
+  pgdata:
+    driver: local
+
+# Networks
+networks:
+  knowledge-network:
+    driver: bridge

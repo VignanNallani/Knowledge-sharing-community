@@ -1,41 +1,6 @@
-
-
-// import express from "express";
-// import { authenticate } from "../middleware/authMiddleware.js";
-// import {
-//   createComment,
-//   getComments,
-//   replyComment,
-//   updateComment,
-//   deleteComment,
-//   toggleCommentLike,
-// } from "../controllers/commentcontroller.js";
-
-// const router = express.Router();
-
-// // Create comment (for a post)
-// router.post("/:postId", authenticate, createComment);
-
-// // Get comments for a post
-// router.get("/:postId", authenticate, getComments);
-
-// // Reply to a comment
-// router.post("/:commentId/reply", authenticate, replyComment);
-
-// // Update comment
-// router.put("/:id", authenticate, updateComment);
-
-// // Delete comment
-// router.delete("/:id", authenticate, deleteComment);
-
-// // Like / Unlike comment or reply
-// router.post("/:commentId/like", authenticate, toggleCommentLike);
-
-// export default router;
-
-
 import express from "express";
-import { authenticate } from "../middleware/authMiddleware.js";
+import { authenticate } from '../middleware/index.js';
+import validate from "../middleware/validate.middleware.js";
 import {
   createComment,
   getComments,
@@ -43,7 +8,9 @@ import {
   updateComment,
   deleteComment,
   toggleCommentLike,
-} from "../controllers/commentcontroller.js";
+} from "../controllers/commentController.js";
+import { createCommentSchema } from "../validators/comment.schema.js";
+import { paginationSchema } from "../validators/pagination.schema.js";
 
 const router = express.Router();
 
@@ -52,16 +19,16 @@ const router = express.Router();
  */
 
 // Get comments for a post (with pagination)
-router.get("/post/:postId", authenticate, getComments);
+router.get("/post/:postId", authenticate, validate(paginationSchema), getComments);
 
 // Create a comment for a post
-router.post("/post/:postId", authenticate, createComment);
+router.post("/post/:postId", authenticate, validate(createCommentSchema), createComment);
 
 // Reply to a comment
-router.post("/reply/:commentId", authenticate, replyComment);
+router.post("/reply/:commentId", authenticate, validate(createCommentSchema), replyComment);
 
 // Update comment
-router.put("/:id", authenticate, updateComment);
+router.put("/:id", authenticate, validate(createCommentSchema), updateComment);
 
 // Delete comment
 router.delete("/:id", authenticate, deleteComment);

@@ -7,7 +7,381 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/* ================= ENUMS ================= */
+model User {
+  id                  Int            @id @default(autoincrement())
+  name                String
+  email               String         @unique
+  password            String
+  role                Role           @default(USER)
+  bio                 String?
+  skills              String?
+  profileImageUrl    String?
+  isActive            Boolean        @default(true)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+  lastLoginAt         DateTime?
+  emailVerified       Boolean        @default(false)
+  loginAttempts       Int            @default(0)
+  lockedUntil         DateTime?
+  activities          Activity[]
+  bookings            Booking[]
+  commentLikes        CommentLike[]
+  comments            Comment[]
+  followers           Follower[]     @relation("UserFollowers")
+  following           Follower[]     @relation("UserFollowing")
+  likes               Like[]
+  mentorshipsAsMentee Mentorship[]   @relation("MenteeRelation")
+  mentorshipsAsMentor Mentorship[]   @relation("MentorRelation")
+  posts               Post[]
+  refreshTokens       RefreshToken[]
+  emailVerifications  EmailVerification[]
+  passwordResets      PasswordReset[]
+  reports             Report[]
+  slots               Slot[]
+  reportedBy          Report[]      @relation("UserReports")
+  eventsCreated        Event[]       @relation("EventCreator")
+  eventAttendees     EventAttendee[]
+  userPoints         UserPoint[]
+  userBadges         UserBadge[]
+  userAchievements  UserAchievement[]
+  leaderboardEntries LeaderboardEntry[]
+  userActivities     UserActivity[]
+  notifications     Notification[]
+  // Clean user relationships only
+  learningPaths      LearningPath[]   @relation("UserLearningPaths")
+  learningPathProgress LearningPathProgress[] @relation("UserLearningProgress")
+
+  @@index([email])
+  @@index([role])
+  @@index([isActive])
+  @@index([createdAt])
+  @@index([lastLoginAt])
+  @@map("users")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  type      String   // 'LIKE', 'COMMENT', 'FOLLOW'
+  message   String
+  read      Boolean  @default(false)
+  postId    Int?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([read])
+  @@index([createdAt])
+  @@index([type])
+  @@map("notifications")
+}
+
+model Activity {
+  id        Int          @id @default(autoincrement())
+  type      ActivityType
+  message   String
+  userId    Int
+  entity    String?
+  entityId  Int?
+  createdAt DateTime     @default(now())
+  user      User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+  @@index([entity, entityId])
+  @@map("activities")
+}
+
+model Post {
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String
+  imageUrl    String?
+  authorId  Int
+  version   Int       @default(1) // For optimistic concurrency control
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime? // Soft delete support
+  idempotencyKey String? @unique // Real idempotency protection
+  comments  Comment[]
+  likes     Like[]
+  tags      PostTag[]
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  reports   Report[]
+
+  @@unique([authorId, title]) // Business rule: no duplicate titles per author
+  @@index([authorId])
+  @@index([createdAt])
+  @@index([title])
+  @@index([deletedAt]) // For soft delete filtering
+  @@map("posts")
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  postId    Int
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+  @@index([postId])
+  @@index([createdAt])
+  @@map("likes")
+}
+
+model Comment {
+  id              Int           @id @default(autoincrement())
+  content         String
+  authorId        Int
+  postId          Int
+  parentCommentId Int?
+  version         Int           @default(1) // For optimistic concurrency control
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  deletedAt       DateTime?     // Soft delete support
+  idempotencyKey  String?       @unique // Real idempotency protection
+  commentLikes    CommentLike[]
+  author          User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent          Comment?      @relation("CommentReplies", fields: [parentCommentId], references: [id])
+  replies         Comment[]     @relation("CommentReplies")
+  post            Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([authorId])
+  @@index([parentCommentId])
+  @@index([createdAt])
+  @@index([postId, createdAt])
+  @@index([deletedAt]) // For soft delete filtering
+  @@map("comments")
+}
+
+model CommentLike {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  commentId Int
+  createdAt DateTime @default(now())
+  comment   Comment  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, commentId])
+  @@index([commentId])
+  @@index([createdAt])
+  @@map("comment_likes")
+}
+
+model Tag {
+  id    Int       @id @default(autoincrement())
+  name  String    @unique
+  posts PostTag[]
+
+  @@index([name])
+  @@map("tags")
+}
+
+model PostTag {
+  postId Int
+  tagId  Int
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+  @@index([tagId])
+  @@map("post_tags")
+}
+
+model Follower {
+  id          Int      @id @default(autoincrement())
+  followerId  Int
+  followingId Int
+  createdAt   DateTime @default(now())
+  follower    User     @relation("UserFollowers", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User     @relation("UserFollowing", fields: [followingId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followingId])
+  @@index([followerId])
+  @@index([followingId])
+  @@index([createdAt])
+  @@map("followers")
+}
+
+model Mentorship {
+  id            Int              @id @default(autoincrement())
+  mentorId      Int
+  menteeId      Int
+  topic         String?
+  status        MentorshipStatus @default(PENDING)
+  preferredSlot DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  mentee        User             @relation("MenteeRelation", fields: [menteeId], references: [id], onDelete: Cascade)
+  mentor        User             @relation("MentorRelation", fields: [mentorId], references: [id], onDelete: Cascade)
+
+  @@index([mentorId])
+  @@index([menteeId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([mentorId, status])
+  @@index([menteeId, status])
+  @@map("mentorships")
+}
+
+model Slot {
+  id        String     @id @default(uuid())
+  mentorId  Int
+  startAt   DateTime
+  endAt     DateTime
+  status    SlotStatus @default(OPEN)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  booking   Booking?
+  meeting   Meeting?
+  mentor    User       @relation(fields: [mentorId], references: [id], onDelete: Cascade)
+
+  @@index([mentorId])
+  @@index([status])
+  @@index([startAt])
+  @@index([mentorId, status])
+  @@index([startAt, endAt])
+  @@map("slots")
+}
+
+model Booking {
+  id        String   @id @default(uuid())
+  slotId    String   @unique
+  menteeId  Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status    BookingStatus @default(PENDING)
+  mentee    User     @relation(fields: [menteeId], references: [id], onDelete: Cascade)
+  slot      Slot     @relation(fields: [slotId], references: [id], onDelete: Cascade)
+
+  @@index([slotId])
+  @@index([menteeId])
+  @@index([createdAt])
+  @@index([status])
+  @@unique([menteeId, slotId]) // Prevent duplicate bookings
+  @@map("bookings")
+}
+
+model Meeting {
+  id        String        @id @default(uuid())
+  slotId    String        @unique
+  meetUrl   String?
+  status    MeetingStatus @default(SCHEDULED)
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  slot      Slot          @relation(fields: [slotId], references: [id], onDelete: Cascade)
+
+  @@index([slotId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("meetings")
+}
+
+model RefreshToken {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  fingerprint String   @unique
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  isActive  Boolean @default(true)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([fingerprint]) // Critical: indexed lookup for O(1) performance
+  @@index([expiresAt])
+  @@index([isActive])
+  @@unique([userId, token]) // Prevent duplicate tokens per user
+  @@map("refresh_tokens")
+}
+
+model EmailVerification {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("email_verifications")
+}
+
+model PasswordReset {
+  id        Int      @id @default(autoincrement())
+  token     String   @unique
+  userId    Int
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("password_resets")
+}
+
+model Report {
+  id         Int       @id @default(autoincrement())
+  reason     String
+  postId     Int?
+  userId     Int?
+  status     ReportStatus @default(PENDING)
+  resolvedBy Int?
+  resolvedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  reporterId Int       // User who filed the report
+  resolutionNotes String?
+  post       Post?     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user       User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reporter   User      @relation("UserReports", fields: [reporterId], references: [id], onDelete: Cascade)
+
+  @@index([postId])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([resolvedBy])
+  @@index([reporterId])
+  @@unique([reporterId, postId]) // Prevent duplicate reports for same post
+  @@unique([reporterId, userId]) // Prevent duplicate reports for same user
+  @@map("reports")
+}
+
+model Event {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  location    String?
+  startsAt    DateTime
+  endsAt      DateTime?
+  createdById  Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  attendees   EventAttendee[]
+  createdBy   User       @relation("EventCreator", fields: [createdById], references: [id])
+
+  @@map("events")
+}
+
+model EventAttendee {
+  id        Int      @id @default(autoincrement())
+  userId     Int
+  eventId    Int
+  joinedAt   DateTime @default(now())
+  event      Event     @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId]) // Prevent duplicate registrations
+  @@map("event_attendees")
+}
 
 enum Role {
   USER
@@ -15,42 +389,349 @@ enum Role {
   MENTOR
 }
 
-/* ================= USER ================= */
-
-model User {
-  id                  Int      @id @default(autoincrement())
-  name                String
-  email               String   @unique
-  password            String
-  bio                 String?
-  skills              String?
-  profileImage        String?
-  role                Role     @default(USER)
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-
-  // Mentorship relations
-  mentorshipsAsMentor Mentorship[] @relation("MentorRelation")
-  mentorshipsAsMentee Mentorship[] @relation("MenteeRelation")
-
-  @@index([email])
+enum SlotStatus {
+  OPEN
+  BOOKED
+  CANCELLED
+  COMPLETED
 }
 
-/* ================= MENTORSHIP ================= */
-
-model Mentorship {
-  id            Int      @id @default(autoincrement())
-  mentorId      Int
-  menteeId      Int
-  topic         String
-  status        String   @default("pending") // "pending", "accepted", "rejected", "cancelled"
-  preferredSlot DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  mentor User @relation("MentorRelation", fields: [mentorId], references: [id], onDelete: Cascade)
-  mentee User @relation("MenteeRelation", fields: [menteeId], references: [id], onDelete: Cascade)
-
-  @@index([mentorId])
-  @@index([menteeId])
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  COMPLETED
 }
+
+enum MeetingStatus {
+  SCHEDULED
+  STARTED
+  ENDED
+  CANCELLED
+}
+
+enum ReportStatus {
+  PENDING
+  RESOLVED
+  DISMISSED
+}
+
+enum ActivityType {
+  POST_CREATED
+  POST_LIKED
+  COMMENT_ADDED
+  EVENT_CREATED
+  EVENT_JOINED
+  USER_FOLLOWED
+  USER_UNFOLLOWED
+  POST_SAVED
+}
+
+enum MentorshipStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  COMPLETED
+}
+
+// Gamification System Models
+model UserPoint {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  points      Int      @default(0)
+  activityType String
+  description String?
+  createdAt   DateTime @default(now())
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([points])
+  @@index([activityType])
+  @@index([createdAt])
+  @@map("user_points")
+}
+
+model Badge {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String
+  type        BadgeType
+  tier        BadgeTier
+  icon        String?
+  criteria    String   // JSON criteria for earning this badge
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  userBadges  UserBadge[]
+  achievements Achievement[]
+
+  @@index([type])
+  @@index([tier])
+  @@index([isActive])
+  @@map("badges")
+}
+
+model UserBadge {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  badgeId     Int
+  earnedAt    DateTime @default(now())
+  progress    Int      @default(0) // Progress towards earning badge (0-100)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge       Badge    @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@index([badgeId])
+  @@index([earnedAt])
+  @@map("user_badges")
+}
+
+model Achievement {
+  id          Int           @id @default(autoincrement())
+  name        String        @unique
+  description String
+  type        AchievementType
+  criteria    String        // JSON criteria for this achievement
+  points      Int           @default(0)
+  badgeId     Int?
+  isActive    Boolean       @default(true)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  userAchievements UserAchievement[]
+  badge       Badge?        @relation(fields: [badgeId], references: [id])
+
+  @@index([type])
+  @@index([isActive])
+  @@index([points])
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            Int         @id @default(autoincrement())
+  userId        Int
+  achievementId Int
+  progress      Int         @default(0) // Progress towards achievement (0-100)
+  completedAt   DateTime?
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@index([userId])
+  @@index([achievementId])
+  @@index([completedAt])
+  @@map("user_achievements")
+}
+
+model Leaderboard {
+  id          Int             @id @default(autoincrement())
+  name        String
+  type        LeaderboardType
+  description String?
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  entries     LeaderboardEntry[]
+
+  @@index([type])
+  @@index([isActive])
+  @@map("leaderboards")
+}
+
+model LeaderboardEntry {
+  id           Int         @id @default(autoincrement())
+  leaderboardId Int
+  userId       Int
+  rank         Int
+  score        Int
+  previousRank Int?
+  lastUpdated  DateTime    @default(now())
+  leaderboard  Leaderboard @relation(fields: [leaderboardId], references: [id], onDelete: Cascade)
+  user         User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([leaderboardId, userId])
+  @@index([leaderboardId])
+  @@index([userId])
+  @@index([rank])
+  @@index([score])
+  @@map("leaderboard_entries")
+}
+
+model UserActivity {
+  id            Int           @id @default(autoincrement())
+  userId        Int
+  activityType  ActivityType
+  entityType    String?       // 'POST', 'COMMENT', 'MENTORSHIP', etc.
+  entityId      Int?          // ID of the related entity
+  pointsEarned  Int           @default(0)
+  description   String?
+  metadata      String?       // JSON metadata for additional context
+  createdAt     DateTime      @default(now())
+  user          User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([activityType])
+  @@index([entityType, entityId])
+  @@index([pointsEarned])
+  @@index([createdAt])
+  @@map("user_activities")
+}
+
+enum BadgeType {
+  CONTRIBUTION
+  ENGAGEMENT
+  MENTORSHIP
+  STREAK
+  SKILL
+  COMMUNITY
+  ACHIEVEMENT
+}
+
+enum BadgeTier {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+  DIAMOND
+}
+
+enum AchievementType {
+  MENTOR_SESSIONS
+  POSTS_CREATED
+  LIKES_RECEIVED
+  COMMENTS_POSTED
+  FOLLOWERS_GAINED
+  STREAK_DAYS
+  SKILL_MASTERY
+  COMMUNITY_CONTRIBUTION
+}
+
+enum LeaderboardType {
+  GLOBAL
+  SKILL_BASED
+  FRIEND_BASED
+  WEEKLY
+  MONTHLY
+}
+
+
+// Temporarily commented out due to schema issues
+// model ScheduledTask {
+//   id          Int            @id @default(autoincrement())
+//   name        String
+//   description String?
+//   taskType    TaskType
+//   config      String         // JSON configuration
+//   cronExpression String?       // Cron expression for recurring tasks
+//   timezone    String         @default('UTC')
+//   isActive    Boolean        @default(true)
+//   lastRunAt   DateTime?
+//   nextRunAt   DateTime?
+//   runCount    Int            @default(0)
+//   createdBy   Int
+//   createdAt   DateTime       @default(now())
+//   updatedAt   DateTime       @updatedAt
+//   creator     User           @relation(fields: [createdBy], references: [id])
+
+//   @@index([taskType])
+//   @@index([createdBy])
+//   @@index([isActive])
+//   @@map("scheduled_tasks")
+// }
+
+
+
+
+// Enhanced Learning Path Models for Day 13
+model LearningPath {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  name        String
+  description String?
+  skills      String[] 
+  targetSkills String? // JSON array of target skills
+  difficulty  String   @default("INTERMEDIATE") // BEGINNER, INTERMEDIATE, ADVANCED
+  estimatedDuration Int? // in hours
+  status      String   @default("in_progress") // in_progress, completed, paused
+  progress    Float    @default(0) // 0-1 progress
+  isActive    Boolean  @default(true)
+  pathType    String   @default("PERSONALIZED") // SKILL_BASED, CAREER_BASED, PERSONALIZED
+  metadata    String?  // JSON metadata for path
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  completedAt DateTime?
+  
+  // Relations
+  user        User     @relation("UserLearningPaths", fields: [userId], references: [id], onDelete: Cascade)
+  steps       LearningPathStep[]
+  progressEntries    LearningPathProgress[] @relation("LearningPathProgress")
+  
+  @@index([userId])
+  @@index([status])
+  @@index([pathType])
+  @@index([isActive])
+  @@index([createdAt])
+  @@map("learning_paths")
+}
+
+model LearningPathStep {
+  id             Int      @id @default(autoincrement())
+  learningPathId Int
+  skill          String
+  stepOrder      Int
+  stepType       String   @default("CONTENT") // CONTENT, EXERCISE, ASSESSMENT, MENTOR_SESSION, PROJECT
+  stepData       String?  // JSON step details
+  title          String
+  description    String?
+  resources      String?  // JSON array of resource IDs/URLs
+  prerequisites  String?  // JSON prerequisites
+  estimatedTime  Int?     // Estimated time in minutes
+  difficulty     String?  // BEGINNER, INTERMEDIATE, ADVANCED
+  isCompleted    Boolean  @default(false)
+  completedAt    DateTime?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  learningPath   LearningPath @relation(fields: [learningPathId], references: [id], onDelete: Cascade)
+  progress       LearningPathProgress[]
+  
+  @@index([learningPathId])
+  @@index([stepOrder])
+  @@index([stepType])
+  @@index([isCompleted])
+  @@index([skill])
+  @@map("learning_path_steps")
+}
+
+model LearningPathProgress {
+  id               Int      @id @default(autoincrement())
+  userId           Int
+  learningPathId   Int
+  stepId           Int?
+  progressType     String   // PATH_PROGRESS, STEP_PROGRESS, SKILL_MASTERY
+  progressValue    Float    // Progress value (0-1)
+  progressData     String?  // JSON detailed progress data
+  timeSpent        Int?     // Time spent in minutes
+  lastAccessedAt   DateTime @default(now())
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  // Relations
+  user             User         @relation("UserLearningProgress", fields: [userId], references: [id], onDelete: Cascade)
+  learningPath     LearningPath @relation("LearningPathProgress", fields: [learningPathId], references: [id], onDelete: Cascade)
+  step             LearningPathStep? @relation(fields: [stepId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, learningPathId, stepId])
+  @@index([userId])
+  @@index([learningPathId])
+  @@index([progressType])
+  @@index([lastAccessedAt])
+  @@map("learning_path_progress")
+}
+
+
+  
+

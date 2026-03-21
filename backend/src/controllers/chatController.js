@@ -1,39 +1,28 @@
-// controllers/chatController.js
-import { PrismaClient } from "@prisma/client";
-const prisma = new PrismaClient();
+import ApiResponse from '../utils/ApiResponse.js';
+import { ApiError } from '../utils/ApiError.js';
+import asyncHandler from '../middleware/asyncHandler.js';
+import chatService from '../services/chat.service.js';
 
-export const getThreads = async (req, res) => {
-  const threads = await prisma.conversation.findMany({
-    where: { members: { some: { userId: req.user.id } } },
-    include: { messages: { orderBy: { createdAt: "desc" }, take: 1 }, members: { include: { user: true } } },
-  });
-  res.json(threads);
-};
+export const getThreads = asyncHandler(async (req, res) => {
+  const result = await chatService.getThreads(req.user.id, req.query);
+  
+  return ApiResponse.success(res, { message: 'Threads fetched', data: result.threads });
+});
 
-export const getMessages = async (req, res) => {
-  const messages = await prisma.message.findMany({
-    where: { conversationId: req.params.id },
-    orderBy: { createdAt: "asc" },
-  });
-  res.json(messages);
-};
+export const getMessages = asyncHandler(async (req, res) => {
+  const result = await chatService.getMessages(req.params.id, req.user.id, req.query);
+  
+  return ApiResponse.success(res, { message: 'Messages fetched', data: result.messages, meta: result.meta });
+});
 
-export const startConversation = async (req, res) => {
-  const { otherUserId } = req.body;
-  let convo = await prisma.conversation.findFirst({
-    where: { members: { every: { userId: { in: [req.user.id, otherUserId] } } } },
-  });
-  if (!convo) {
-    convo = await prisma.conversation.create({
-      data: { members: { create: [{ userId: req.user.id }, { userId: otherUserId }] } },
-    });
-  }
-  res.json(convo);
-};
+export const startConversation = asyncHandler(async (req, res) => {
+  const conversation = await chatService.startConversation(req.user.id, req.body.otherUserId);
 
-export const sendMessage = async (req, res) => {
-  const message = await prisma.message.create({
-    data: { conversationId: req.params.id, senderId: req.user.id, body: req.body.body },
-  });
-  res.status(201).json(message);
-};
+  return ApiResponse.created(res, { message: 'Conversation started', data: conversation });
+});
+
+export const sendMessage = asyncHandler(async (req, res) => {
+  const message = await chatService.sendMessage(req.params.id, req.user.id, req.body);
+
+  return ApiResponse.created(res, { message: 'Message sent', data: message });
+});

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Follow System</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #0A0F1E; color: white; }
+        button { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; }
+        .follow { background: #3B82F6; color: white; }
+        .following { background: #10B981; color: white; }
+        .result { margin: 10px 0; padding: 10px; background: #1A2235; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Follow System Test</h1>
+    
+    <div>
+        <h3>Test Follow/Unfollow API</h3>
+        <button onclick="testFollow()" class="follow">Follow Sarah Chen (ID: 212)</button>
+        <button onclick="testUnfollow()" class="following">Unfollow Sarah Chen</button>
+        <button onclick="testGetFollowers()">Get Sarah's Followers</button>
+        <button onclick="testGetFollowing()">Get Sarah's Following</button>
+    </div>
+    
+    <div id="results"></div>
+
+    <script>
+        const API_BASE = 'http://localhost:4000/api/v1';
+        let authToken = null;
+
+        // First, login to get a token
+        async function login() {
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'vikas@example.com',
+                        password: 'password123'
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    authToken = data.data.accessToken;
+                    document.getElementById('results').innerHTML += '<div class="result">✅ Login successful</div>';
+                    return true;
+                } else {
+                    document.getElementById('results').innerHTML += `<div class="result">❌ Login failed: ${data.message}</div>`;
+                    return false;
+                }
+            } catch (error) {
+                document.getElementById('results').innerHTML += `<div class="result">❌ Login error: ${error.message}</div>`;
+                return false;
+            }
+        }
+
+        async function testFollow() {
+            if (!authToken && !(await login())) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/users/212/follow`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                document.getElementById('results').innerHTML += `<div class="result">📝 Follow response: ${JSON.stringify(data, null, 2)}</div>`;
+            } catch (error) {
+                document.getElementById('results').innerHTML += `<div class="result">❌ Follow error: ${error.message}</div>`;
+            }
+        }
+
+        async function testUnfollow() {
+            if (!authToken && !(await login())) return;
+            
+            try {
+                const response = await fetch(`${API_BASE}/users/212/follow`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+                
+                const data = await response.json();
+                document.getElementById('results').innerHTML += `<div class="result">📝 Unfollow response: ${JSON.stringify(data, null, 2)}</div>`;
+            } catch (error) {
+                document.getElementById('results').innerHTML += `<div class="result">❌ Unfollow error: ${error.message}</div>`;
+            }
+        }
+
+        async function testGetFollowers() {
+            try {
+                const response = await fetch(`${API_BASE}/users/212/followers`);
+                const data = await response.json();
+                document.getElementById('results').innerHTML += `<div class="result">👥 Followers: ${JSON.stringify(data, null, 2)}</div>`;
+            } catch (error) {
+                document.getElementById('results').innerHTML += `<div class="result">❌ Get followers error: ${error.message}</div>`;
+            }
+        }
+
+        async function testGetFollowing() {
+            try {
+                const response = await fetch(`${API_BASE}/users/212/following`);
+                const data = await response.json();
+                document.getElementById('results').innerHTML += `<div class="result">👤 Following: ${JSON.stringify(data, null, 2)}</div>`;
+            } catch (error) {
+                document.getElementById('results').innerHTML += `<div class="result">❌ Get following error: ${error.message}</div>`;
+            }
+        }
+
+        // Test if backend is running
+        fetch(`${API_BASE}/health`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('results').innerHTML += '<div class="result">✅ Backend is running</div>';
+            })
+            .catch(error => {
+                document.getElementById('results').innerHTML += '<div class="result">❌ Backend is not running</div>';
+            });
+    </script>
+</body>
+</html>

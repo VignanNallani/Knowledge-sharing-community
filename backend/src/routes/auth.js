@@ -1,5 +1,8 @@
 import { Router } from "express";
-import { register, login } from "../controllers/authController.js";
+import AuthController from "../controllers/authController.js";
+import validate from "../middleware/validate.middleware.js";
+import { registerSchema, loginSchema } from "../validators/auth.schema.js";
+import { authenticate } from "../middleware/authMiddleware.js";
 
 const router = Router();
 
@@ -52,7 +55,7 @@ const router = Router();
  *       500:
  *         description: Internal server error
  */
-router.post("/register", register);
+router.post("/register", validate(registerSchema), AuthController.register);
 
 /**
  * @swagger
@@ -107,6 +110,85 @@ router.post("/register", register);
  *       500:
  *         description: Internal server error
  */
-router.post("/login", login);
+router.post("/login", validate(loginSchema), AuthController.login);
+
+/**
+ * @swagger
+ * /api/auth/refresh:
+ *   post:
+ *     summary: Refresh access token
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refreshToken
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 example: "refresh_token_here"
+ *     responses:
+ *       200:
+ *         description: Token refreshed successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 accessToken:
+ *                   type: string
+ *                   example: "new_access_token_here"
+ *                 refreshToken:
+ *                   type: string
+ *                   example: "new_refresh_token_here"
+ *       401:
+ *         description: Invalid or expired refresh token
+ */
+router.post("/refresh", AuthController.refresh);
+
+/**
+ * @swagger
+ * /api/auth/logout:
+ *   post:
+ *     summary: Logout user (revoke refresh token)
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refreshToken
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *                 example: "refresh_token_here"
+ *     responses:
+ *       200:
+ *         description: Logout successful
+ *       400:
+ *         description: Refresh token is required
+ */
+router.post("/logout", AuthController.logout);
+
+/**
+ * @swagger
+ * /api/auth/logout-all:
+ *   post:
+ *     summary: Logout from all devices
+ *     tags: [Auth]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logged out from all devices successfully
+ *       401:
+ *         description: Unauthorized
+ */
+router.post("/logout-all", authenticate, AuthController.logoutAll);
 
 export default router;

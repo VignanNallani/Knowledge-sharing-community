@@ -1,0 +1,142 @@
+mermaid
+graph TD
+    %% User Journey Flows for Mentorship System
+    
+    %% Mentor Discovery Flow
+    subgraph Mentor Discovery
+        A[User Visits Platform] --> B{Has Mentee Profile?}
+        B -->|No| C[Create Mentee Profile]
+        B -->|Yes| D[Browse Mentors]
+        C --> D
+        D --> E[Apply Filters]
+        E --> F[View Mentor Profiles]
+        F --> G{Interested?}
+        G -->|No| E
+        G -->|Yes| H[Send Request]
+    end
+    
+    %% Mentorship Request Flow
+    subgraph Request Process
+        H --> I[Fill Request Details]
+        I --> J[Select Skills]
+        J --> K[Write Message]
+        K --> L[Submit Request]
+        L --> M[Request Sent to Mentor]
+        M --> N{48 Hour Timer}
+        N -->|Expires| O[Request Expired]
+        N -->|Responded| P{Mentor Response}
+        P -->|Accept| Q[Relationship Created]
+        P -->|Reject| R[Request Rejected]
+        O --> S[Can Reapply Later]
+        R --> S
+    end
+    
+    %% Active Mentorship Flow
+    subgraph Active Relationship
+        Q --> T[Schedule First Session]
+        T --> U[Session Preparation]
+        U --> V[Conduct Session]
+        V --> W[Submit Feedback]
+        W --> X{Continue?}
+        X -->|Yes| Y[Schedule Next Session]
+        X -->|No| Z[Complete Relationship]
+        Y --> U
+        Z --> AA[Final Feedback]
+        AA --> BB[Trust Score Updated]
+    end
+    
+    %% Trust Score Flow
+    subgraph Trust System
+        BB --> CC[Calculate New Score]
+        CC --> DD[Update Components]
+        DD --> EE[Check Trend]
+        EE --> FF[Notify User]
+        FF --> GG[Display Updated Score]
+    end
+    
+    %% Matching Algorithm Flow
+    subgraph Smart Matching
+        HH[Mentee Seeks Mentor] --> II[Analyze Profile]
+        II --> JJ[Extract Preferences]
+        JJ --> KK[Score Compatibility]
+        KK --> LL[Rank Mentors]
+        LL --> MM[Present Recommendations]
+        MM --> NN{User Selects}
+        NN -->|Yes| H
+        NN -->|No| OO[Refine Search]
+        OO --> JJ
+    end
+    
+    %% Security Flow
+    subgraph Security Checks
+        PP[User Action] --> QQ[Behavior Analysis]
+        QQ --> RR{Suspicious?}
+        RR -->|Yes| SS[Flag Account]
+        RR -->|No| TT[Process Normally]
+        SS --> UU[Require Verification]
+        UU --> VV{Verified?}
+        VV -->|Yes| TT
+        VV -->|No| WW[Block Account]
+    end
+    
+    %% Admin Flow
+    subgraph Admin Operations
+        XX[Admin Login] --> YY[View Dashboard]
+        YY --> ZZ[Monitor Requests]
+        ZZ --> AAA{Action Needed?}
+        AAA -->|Yes| BBB[Review Case]
+        AAA -->|No| CCC[Continue Monitoring]
+        BBB --> DDD{Decision}
+        DDD -->|Verify Mentor| EEE[Approve Verification]
+        DDD -->|Adjust Trust| FFF[Manual Score Adjustment]
+        DDD -->|Handle Dispute| GGG[Resolve Conflict]
+        EEE --> CCC
+        FFF --> CCC
+        GGG --> CCC
+    end
+    
+    %% Payment Flow (if applicable)
+    subgraph Payment Processing
+        HHH[Session Scheduled] --> III[Payment Required]
+        III --> JJJ[Process Payment]
+        JJJ --> KKK{Payment Success?}
+        KKK -->|Yes| LLL[Confirm Session]
+        KKK -->|No| MMM[Cancel Session]
+        MMM --> NNN[Refund Process]
+        LLL --> V
+        NNN --> OOO[Notify Users]
+    end
+    
+    %% Feedback Loop
+    subgraph Continuous Improvement
+        PPP[Collect Feedback] --> QQQ[Analyze Patterns]
+        QQQ --> RRR[Update Algorithm]
+        RRR --> SSS[Improve Matching]
+        SSS --> TTT[Enhance Features]
+        TTT --> UUU[Monitor Impact]
+        UUU --> PPP
+    end
+    
+    %% Data Flow Connections
+    H --> M
+    Q --> T
+    V --> W
+    W --> BB
+    II --> KK
+    QQ --> RR
+    ZZ --> BBB
+    
+    %% Styling
+    classDef userAction fill:#e1f5fe
+    classDef systemAction fill:#f3e5f5
+    classDef decision fill:#fff3e0
+    classDef success fill:#e8f5e8
+    classDef warning fill:#fff8e1
+    classDef error fill:#ffebee
+    
+    class A,B,C,D,E,F,G,H,I,J,K,L userAction
+    class M,N,O,P,Q,R,S,T,U,V,W,X,Y,Z,AA,BB systemAction
+    class B,G,N,P,X,NN,AAA,DDD,KKK decision
+    class Q,BB,GG,LLL success
+    class O,R,SS,UU,MMM,NNN warning
+    class WW error

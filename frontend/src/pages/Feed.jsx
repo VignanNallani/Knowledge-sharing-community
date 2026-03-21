@@ -134,7 +134,7 @@ export default function Feed() {
   const fetchFeed = async () => {
     try {
       setLoading(true);
-      const res = await api.get("/api/posts");
+      const res = await api.get("/api/v1/posts");
 
       const data =
         res.data?.posts ||

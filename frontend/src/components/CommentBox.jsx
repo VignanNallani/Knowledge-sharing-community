@@ -70,6 +70,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import api from "../api/axios";
+import PropTypes from 'prop-types';
 
 export default function CommentBox({
   postId,
@@ -156,3 +157,9 @@ export default function CommentBox({
     </motion.div>
   );
 }
+
+CommentBox.propTypes = {
+  postId: PropTypes.string.isRequired,
+  onSuccess: PropTypes.func,
+  onOptimisticAdd: PropTypes.func
+};

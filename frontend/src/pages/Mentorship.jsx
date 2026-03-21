@@ -1,0 +1,162 @@
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
+export default function Mentorship() {
+  // Mock mentor data
+  const mentors = [
+    {
+      id: 1,
+      name: "Sarah Chen",
+      role: "Senior Frontend Engineer",
+      company: "TechCorp",
+      bio: "10+ years building scalable React applications. Specialized in performance optimization and modern frontend architectures.",
+      hourlyRate: 150,
+      rating: 4.9,
+      sessionsCompleted: 127,
+      skills: ["React", "TypeScript", "Next.js", "Tailwind CSS"],
+      available: true
+    },
+    {
+      id: 2,
+      name: "Michael Rodriguez",
+      role: "Backend Architect",
+      company: "DataSystems Inc",
+      bio: "Expert in microservices, database design, and cloud infrastructure. Helped scale multiple startups from 0 to 100M users.",
+      hourlyRate: 200,
+      rating: 4.8,
+      sessionsCompleted: 89,
+      skills: ["Node.js", "Python", "AWS", "PostgreSQL", "Docker"],
+      available: true
+    },
+    {
+      id: 3,
+      name: "Emily Johnson",
+      role: "AI/ML Engineer",
+      company: "AILabs",
+      bio: "Building production ML systems and NLP applications. Published researcher in natural language processing.",
+      hourlyRate: 180,
+      rating: 5.0,
+      sessionsCompleted: 156,
+      skills: ["Python", "TensorFlow", "PyTorch", "Machine Learning"],
+      available: false
+    },
+    {
+      id: 4,
+      name: "David Kim",
+      role: "DevOps Specialist",
+      company: "CloudOps",
+      bio: "CI/CD pipelines, Kubernetes orchestration, and infrastructure automation. Reduced deployment time by 80%.",
+      hourlyRate: 120,
+      rating: 4.7,
+      sessionsCompleted: 203,
+      skills: ["Docker", "Kubernetes", "AWS", "Terraform", "GitHub Actions"],
+      available: true
+    }
+  ];
+
+  return (
+    <div className="space-y-8">
+      {/* Hero Section */}
+      <div className="text-center py-12">
+        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          Find Your Perfect Mentor
+        </h1>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          Connect with industry experts who can accelerate your career growth
+        </p>
+      </div>
+
+      {/* Filters */}
+      <div className="max-w-4xl mx-auto mb-8">
+        <div className="flex flex-wrap gap-4 justify-center">
+          <Button variant="outline" size="sm">All</Button>
+          <Button variant="outline" size="sm">Frontend</Button>
+          <Button variant="outline" size="sm">Backend</Button>
+          <Button variant="outline" size="sm">AI/ML</Button>
+          <Button variant="outline" size="sm">DevOps</Button>
+          <Button variant="outline" size="sm">Design</Button>
+        </div>
+      </div>
+
+      {/* Mentor Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {mentors.map((mentor) => (
+          <Card key={mentor.id} className="hover:shadow-lg transition-shadow">
+            <CardContent className="p-6">
+              {/* Header */}
+              <div className="flex items-start space-x-4 mb-4">
+                <Avatar className="w-16 h-16">
+                  <AvatarFallback className="bg-blue-100 text-blue-600">
+                    {mentor.name.split(' ').map(n => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-gray-900 text-lg">
+                    {mentor.name}
+                  </h3>
+                  <p className="text-gray-600 font-medium">
+                    {mentor.role}
+                  </p>
+                  <p className="text-gray-500 text-sm">
+                    {mentor.company}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <div className="flex items-center space-x-1">
+                    <span className="text-yellow-500">⭐</span>
+                    <span className="font-semibold">{mentor.rating}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bio */}
+              <p className="text-gray-600 mb-4 line-clamp-3">
+                {mentor.bio}
+              </p>
+
+              {/* Skills */}
+              <div className="mb-4">
+                <div className="flex flex-wrap gap-2">
+                  {mentor.skills.map((skill, index) => (
+                    <span 
+                      key={index}
+                      className="px-3 py-1 bg-blue-100 text-blue-700 text-xs rounded-full"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Stats */}
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900">
+                    ${mentor.hourlyRate}
+                  </div>
+                  <div className="text-gray-500 text-sm">/hour</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-2xl font-bold text-gray-900">
+                    {mentor.sessionsCompleted}
+                  </div>
+                  <div className="text-gray-500 text-sm">sessions</div>
+                </div>
+              </div>
+
+              {/* Action Button */}
+              <Button 
+                className="w-full" 
+                disabled={!mentor.available}
+                variant={mentor.available ? "default" : "secondary"}
+              >
+                {mentor.available ? "Book Session" : "Currently Unavailable"}
+              </Button>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+}

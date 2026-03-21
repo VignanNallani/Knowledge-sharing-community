@@ -1,0 +1,26 @@
+{
+  "dependencies": {
+    "axios": "^1.13.6"
+  },
+  "devDependencies": {
+    "k6": "^0.0.0"
+  },
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "npm run build:backend && npm run build:frontend",
+    "build:backend": "cd backend && npm run build",
+    "build:frontend": "cd frontend && npm run build",
+    "test": "npm run test:backend && npm run test:frontend",
+    "test:backend": "cd backend && npm test",
+    "test:frontend": "cd frontend && npm test",
+    "load-test:smoke": "k6 run load-tests/smoke-test.js",
+    "load-test:auth": "k6 run load-tests/auth-stress-test.js",
+    "load-test:performance": "k6 run load-tests/performance-test.js",
+    "load-test:all": "npm run load-test:smoke && npm run load-test:auth && npm run load-test:performance",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f"
+  }
+}
