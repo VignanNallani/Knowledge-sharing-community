@@ -379,13 +379,13 @@ class EventBus {
 // Create singleton instance
 const eventBus = new EventBus();
 
-// Handle process termination gracefully
-process.on('SIGTERM', () => {
-  eventBus.shutdown();
-});
+// Handle process termination gracefully - DISABLED for Render compatibility
+// process.on('SIGTERM', () => {
+//   eventBus.shutdown();
+// });
 
-process.on('SIGINT', () => {
-  eventBus.shutdown();
-});
+// process.on('SIGINT', () => {
+//   eventBus.shutdown();
+// });
 
 export default eventBus;
