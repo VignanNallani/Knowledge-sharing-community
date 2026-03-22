@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
 
 // Create axios instance with auth
 const api = axios.create({

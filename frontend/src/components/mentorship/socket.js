@@ -1,6 +1,6 @@
 import { io } from "socket.io-client";
 
-export const socket = io(process.env.REACT_APP_BACKEND_URL || "http://localhost:4000", {
+export const socket = io(import.meta.env.VITE_API_BASE_URL || "http://localhost:4000", {
   autoConnect: false,
   withCredentials: true,
 });
