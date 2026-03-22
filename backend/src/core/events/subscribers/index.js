@@ -74,9 +74,9 @@ async function shutdownSubscribers() {
 //   });
 // });
 
-// Handle process termination gracefully
-process.on('SIGTERM', shutdownSubscribers);
-process.on('SIGINT', shutdownSubscribers);
+// Handle process termination gracefully - DISABLED for Render compatibility
+// process.on('SIGTERM', shutdownSubscribers);
+// process.on('SIGINT', shutdownSubscribers);
 
 export {
   notificationSubscriber,
