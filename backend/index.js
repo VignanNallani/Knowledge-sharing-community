@@ -558,7 +558,7 @@ async function startServer() {
   // Initialize socket service
   socketService.initialize(server);
 
-  server.listen(PORT, () => {
+  server.listen(PORT, '0.0.0.0', () => {
     logger.info(`🚀 Server running on http://localhost:${PORT}`);
     logger.info(`📘 Swagger Docs: http://localhost:${PORT}/api/docs`);
     
