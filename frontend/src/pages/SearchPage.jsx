@@ -70,7 +70,7 @@ export default function SearchPage() {
         <div style={{ display: 'flex', gap: 8, marginBottom: 28 }}>
           {['posts', 'users'].map(tab => (
             <button key={tab} onClick={() => setActiveTab(tab)} style={{
-              padding: '8px 22px', borderRadius: 8, border: 'none', cursor: 'pointer',
+              padding: '8px 22px', borderRadius: 8, cursor: 'pointer',
               fontWeight: 600, fontSize: 14, transition: 'all 0.15s',
               background: activeTab === tab ? '#6366f1' : '#1a1d2e',
               color: activeTab === tab ? '#fff' : '#94a3b8',
