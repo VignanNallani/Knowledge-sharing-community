@@ -46,7 +46,7 @@ export const corsOptions = {
     // Log the origin for debugging
     console.log('CORS check for origin:', origin);
 
-    if (allowedOrigins.includes(origin) || origin.includes('localhost') || origin.includes('127.0.0.1')) {
+    if (allowedOrigins.includes(origin) || origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('vercel.app')) {
       callback(null, true);
     } else {
       // For development, be more permissive
