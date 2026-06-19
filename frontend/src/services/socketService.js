@@ -16,7 +16,10 @@ class SocketService {
         return;
       }
 
-      this.socket = io(process.env.REACT_APP_API_URL || 'http://localhost:4000', {
+      // Prefer Vite env vars in production, fallback to window origin, then localhost
+      const socketUrl = import.meta.env.VITE_SOCKET_URL || import.meta.env.VITE_API_BASE_URL || window.location.origin;
+
+      this.socket = io(socketUrl, {
         auth: {
           token
         },
